@@ -1,8 +1,14 @@
-local PT, PreciseTimer
+PreciseTimer, PT = "PreciseTimer"
 
 haveFFI, ffi = pcall require, "ffi"
 if haveFFI
-	haveFFI, PT = pcall ffi.load, "PreciseTimer"
+	if aegisub
+		libPath= "/automation/include/#{PreciseTimer}/#{PreciseTimer}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+		haveFFI, PT = pcall ffi.load, aegisub.decode_path "?user"..libPath
+		unless haveFFI
+			haveFFI, PT = pcall ffi.load, aegisub.decode_path "?data"..libPath
+	else
+		haveFFI, PT = pcall ffi.load, PreciseTimer
 
 unless haveFFI
 	class PreciseTimer
