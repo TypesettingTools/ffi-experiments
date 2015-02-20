@@ -21,6 +21,8 @@ unless haveFFI
 else
 	ffi.cdef [[
 		___INCLUDE___
+void Sleep(int ms);
+int poll(struct pollfd *fds, unsigned long nfds, int timeout);
 	]]
 
 	class PreciseTimer
@@ -32,6 +34,8 @@ else
 
 		timeElapsed: =>
 			return PT.getDuration @timer
+
+		sleep: ffi.os == "Windows" and ( (ms) => ffi.C.Sleep ms ) or ( (ms) => ffi.C.poll nil, 0, s*1000 )
 
 -- ffi.cdef "int usleep( unsigned int usec );"
 
