@@ -71,7 +71,6 @@ int DownloadManager::busy( void ) {
 			if ((*downloader)->failed)
 				++failedCount;
 			(*downloader)->join( );
-			std::cout << "Zoop: " << i << std::endl;
 			++finishedCount;
 		}
 		++i;
