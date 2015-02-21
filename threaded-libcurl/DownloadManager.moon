@@ -1,21 +1,14 @@
 ffi = require "ffi"
-sleep = ( ms = 100 ) ->
-	ffi.C.usleep ms*1000
-
-if ffi.os == "Windows"
-	ffi.cdef "void Sleep(unsigned long dwMilliseconds);"
-	sleep = ( ms = 100 ) ->
-		ffi.C.Sleep ms
-else
-	ffi.cdef "int usleep(unsigned int useconds);"
-
 ffi.cdef [[
 ___INCLUDE___
+int usleep(unsigned int useconds);
+void Sleep(unsigned long dwMilliseconds);
 ]]
 
-DM = nil
+sleep = ffi.os == "Windows" and ( (ms=100) -> ffi.C.Sleep ms ) or ( (ms=100) -> ffi.C.usleep ms*1000 )
 
 class DownloadManager
+	DM = nil
 	freeManager = ( manager ) ->
 		DM.freeDM manager
 
