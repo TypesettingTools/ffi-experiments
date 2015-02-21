@@ -11,6 +11,12 @@ class DownloadManager
 	DM = nil
 	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
+	msgs = {
+		addMissingArgs: "Arguments #1 (url) and #2 (outfile) must not be nil, got url=%s, outfile=%s.",
+		outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
+		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s."
+	}
+
 	freeManager = ( manager ) ->
 		DM.freeDM manager
 
@@ -31,8 +37,27 @@ class DownloadManager
 		@errorStrings = {}
 
 	addDownload: ( url, outfile, sha1 ) =>
-		if nil == DM
-			return nil, "DM not initialized."
+		unless url and outfile
+			return nil, msgs.addMissingArgs\format tostring(url), tostring(outfile)
+
+		dev, dir, file = outfile\match "^(#{ffi.os=='Windows' and '%a:[\\/]' or '[/~]'})(.*)[/\\](.*)$"
+
+		-- check if outfile is a full path as we don't support relative ones or automatic file naming
+		if not dev or #dir<1 and dev != "~"
+			return nil, msgs.outNoFullPath\format outfile
+		elseif #file<1
+			return nil, msgs.outNoFile\format outfile
+
+		dir = dev..dir
+		-- check if directory exists
+		mode, err = lfs.attributes dir, "mode"
+		if mode != "directory"
+			return nil, err if err -- lfs.attributes returns nil and no error if the folder wasn't found
+			-- create directory
+			res, err = lfs.mkdir dir
+			return nil, err if err -- lfs.mkdir returns nil on sucess and error alike
+
+		return nil, msgs.notInitialized unless DM
 
 		DM.addDownload @manager, url, outfile, sha1
 		@downloads += 1
