@@ -12,6 +12,7 @@ class DownloadManager
 	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	msgs = {
+		notInitialized: "#{@__name} not initialized.",
 		addMissingArgs: "Arguments #1 (url) and #2 (outfile) must not be nil, got url=%s, outfile=%s.",
 		outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
 		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s."
@@ -64,18 +65,17 @@ class DownloadManager
 		return @downloads
 
 	progress: =>
-		if nil == DM
-			return nil, "DM not initialized."
+		return nil, msgs.notInitialized unless DM
+
 		DM.progress @manager
 
 	cancel: =>
-		if nil == DM
-			return nil, "DM not initialized."
+		return nil, msgs.notInitialized unless DM
+
 		DM.terminate @manager
 
 	clear: =>
-		if nil == DM
-			return nil, "DM not initialized."
+		return nil, msgs.notInitialized unless DM
 
 		DM.clear @manager
 		@failed = {}
@@ -84,8 +84,8 @@ class DownloadManager
 		@errorStrings = {}
 
 	waitForFinish: ( callback ) =>
-		if nil == DM
-			return nil, "DM not initialized."
+		return nil, msgs.notInitialized unless DM
+
 		while 0 != DM.busy @manager
 			if nil != callback @progress!
 				return
