@@ -67,7 +67,7 @@ class DownloadManager
 	progress: =>
 		return nil, msgs.notInitialized unless DM
 
-		DM.progress @manager
+		math.floor 100 * DM.progress @manager
 
 	cancel: =>
 		return nil, msgs.notInitialized unless DM
