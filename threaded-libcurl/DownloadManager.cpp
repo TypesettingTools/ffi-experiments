@@ -14,7 +14,13 @@ DownloadManager::~DownloadManager( void ) {
 }
 
 double DownloadManager::getProgress( void ) {
-	return (addedCount > 0)? finishedCount/(double)addedCount: -1.0;
+	double progress = finishedCount;
+	for (const auto& downloader : downloaders) {
+		if (downloader->total > 0 && !downloader->done) {
+			progress += downloader->current/(double)downloader->total;
+		}
+	}
+	return (addedCount > 0)? progress/addedCount: 0;
 }
 
 unsigned int DownloadManager::addDownload( std::string url, std::string outfile ) {
