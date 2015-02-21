@@ -1,0 +1,4 @@
+*.processed.*
+*.o
+*.dylib
+*.so
