@@ -22,6 +22,8 @@ class DownloadManager
 	new: ( libraryPath = "", library = "DownloadManager" ) =>
 		if nil == DM
 			success, DM = pcall ffi.load, libraryPath .. library
+			unless success
+				print "doof"
 			assert success, DM
 		@manager = ffi.gc DM.newDM!, freeManager
 		@failed = {}
