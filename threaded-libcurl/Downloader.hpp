@@ -5,6 +5,8 @@
 
 #include "sha1.h"
 
+int sha1compare( uint8_t digest[SHA1_DIGEST_SIZE], const std::string sha1 );
+
 class Downloader {
 	std::thread thread;
 	std::string url,

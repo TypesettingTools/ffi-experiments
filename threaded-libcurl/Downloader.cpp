@@ -13,10 +13,14 @@ static int curlProgressCallback( void *userdata, curl_off_t dltotal, curl_off_t 
 	return static_cast<Downloader*>(userdata)->progressCallback( dltotal, dlnow );
 }
 
-static int sha1compare( uint8_t digest[SHA1_DIGEST_SIZE], std::string sha1 ) {
+int sha1compare( uint8_t digest[SHA1_DIGEST_SIZE], const std::string sha1 ) {
 	char hash[41];
 	for( unsigned int offset = 0; offset < SHA1_DIGEST_SIZE; offset++ ) {
-		snprintf( hash+2*offset, 3, "%02x", digest[offset] );
+#ifdef _WIN32
+		_snprintf_s( hash + 2*offset, 3, _TRUNCATE, "%02x", digest[offset]);
+#else
+		snprintf( hash + 2*offset, 3, "%02x", digest[offset] );
+#endif // _WIN32
 	}
 	return (std::string(hash) != sha1);
 }
