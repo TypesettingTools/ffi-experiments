@@ -1,3 +1,59 @@
+[[   ---------- Usage ----------
+
+1. Create a DownloadManager:
+
+	manager = DownloadManager!
+
+	You can supply a single library search path or a table of search paths for the DownloadManager library.
+	On Aegisub, this will default to the system and user DownloadManager module directories.
+	Otherwise the default library search path will be used.
+
+2. Add some downloads:
+
+	manager\addDownload "https://a.real.website", "out3"
+
+	If you have a SHA-1 hash to check the downloaded file against, use:
+		manager\addDownload "https://a.real.website", "out2", "b52854d1f79de5ebeebf0160447a09c7a8c2cde4"
+
+	You may want to keep the ID of your download to check its result later:
+		id = manager\addDownload "https://a.real.website", "out2",
+
+	Downloads will start immediately. Do whatever you want here while downloads happen in the background.
+	The output file must contain a full path and file name. There is no working directory and automatic file naming is unsupported.
+
+3. Wait for downloads to finish:
+
+	Call manager\waitForFinish(cb) to loop until remaining downloads finish.
+	The progress callback can call manager\cancel! or manager\clear! to interrupt and break open connections.
+
+	The current overall progress will be passed to the provided callback as a number in range 0-100:
+		manager\waitForFinish ( progress ) ->
+			print tostring progress
+
+4. Check for download errors:
+
+	Check a specific download:
+		if manager\error[id]
+			error manager\error[id]
+
+	Get a list of failed downloads:
+		for id in *manager.failedDownloads
+			print "Download #{id} error: #{manager.error[id]}"
+
+5. Clear all downloads:
+
+	manager\clear!
+
+	Removes all downloads as well as results/error messages, so previous IDs become invalid.
+
+
+Error Handling:
+	Errors are handled in typical Lua fashion.
+	DownloadManager will only throw an error in case the library failed to load.
+	If any other error is encoutered the script will return nil along with an error message.
+
+]]
+
 ffi = require "ffi"
 ffi.cdef [[
 ___INCLUDE___
@@ -98,20 +154,3 @@ class DownloadManager
 				@failedCount +=1
 				@failedDownloads[@failedCount] = i
 				@error[i] = ffi.string err
-
--- manager = DownloadManager!
--- manager\addDownload "https://a.real.website", "out1", "b52854d1f79de5ebeebf0160447a09c7a8c2cde4"
--- manager\addDownload "https://a.real.website", "out2", "this isn't a real sha1"
--- manager\addDownload "https://a.real.website", "out3"
--- -- Do whatever you want here while downloads happen in the background.
-
--- -- Call manager\waitForFinish(cb) to loop until remaining downloads
--- -- finish. The progress callback can call manager\cancel! or
--- -- manager\clear! to interrupt and break open connections.
--- manager\waitForFinish ( progress ) ->
--- 	print tostring progress
-
--- -- And get error strings.
--- for i = 1, manager.failedCount
--- 	idx = manager.failed[i]
--- 	print "Download #{idx} error: " .. manager.errorStrings[idx]
