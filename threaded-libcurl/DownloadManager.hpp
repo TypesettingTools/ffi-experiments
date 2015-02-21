@@ -19,4 +19,6 @@ class DownloadManager {
 		void terminate( void );
 		void clear( void );
 		int busy( void );
+		static int checkFileSHA1( std::string filename, std::string expected );
+		static int checkStringSHA1( std::string string, std::string expecteds );
 };

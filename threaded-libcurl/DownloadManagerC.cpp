@@ -40,6 +40,14 @@ extern "C" {
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
+	int checkFileSHA1( const char *filename, const char *expected ) {
+		return DownloadManager::checkFileSHA1( std::string( filename ), std::string( expected ) );
+	}
+
+	int checkStringSHA1( const char *string, const char *expected ) {
+		return DownloadManager::checkStringSHA1( std::string( string ), std::string( expected ) );
+	}
+
 	void freeDM( CDlM* mgr ) {
 		delete reinterpret_cast<DownloadManager*>(mgr);
 	}
