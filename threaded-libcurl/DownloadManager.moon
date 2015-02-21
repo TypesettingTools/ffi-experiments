@@ -32,10 +32,10 @@ class DownloadManager
 			error DM unless success
 
 		@manager = ffi.gc DM.newDM!, freeManager
-		@failed = {}
-		@downloads = 0
+		@failedDownloads = {}
+		@downloadCount = 0
 		@failedCount = 0
-		@errorStrings = {}
+		@error = {}
 
 	addDownload: ( url, outfile, sha1 ) =>
 		unless url and outfile
@@ -61,8 +61,8 @@ class DownloadManager
 		return nil, msgs.notInitialized unless DM
 
 		DM.addDownload @manager, url, outfile, sha1
-		@downloads += 1
-		return @downloads
+		@downloadCount += 1
+		return @downloadCount
 
 	progress: =>
 		return nil, msgs.notInitialized unless DM
@@ -78,10 +78,10 @@ class DownloadManager
 		return nil, msgs.notInitialized unless DM
 
 		DM.clear @manager
-		@failed = {}
-		@downloads = 0
+		@failedDownloads = {}
+		@downloadCount = 0
 		@failedCount = 0
-		@errorStrings = {}
+		@error = {}
 
 	waitForFinish: ( callback ) =>
 		return nil, msgs.notInitialized unless DM
@@ -93,12 +93,12 @@ class DownloadManager
 
 		-- This is horrible. Extracting errors from this is horrible. Why.
 		@failedCount = 0
-		for i = 1, @downloads
+		for i = 1, @downloadCount
 			err = DM.getError @manager, i
 			if nil != err
-				@failedCount += 1
-				@failed[@failedCount] = i
-				@errorStrings[i] = ffi.string err
+				@failedCount +=1
+				@failedDownloads[@failedCount] = i
+				@error[i] = ffi.string err
 
 -- manager = DownloadManager!
 -- manager\addDownload "https://a.real.website", "out1", "b52854d1f79de5ebeebf0160447a09c7a8c2cde4"
