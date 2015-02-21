@@ -87,11 +87,10 @@ class DownloadManager
 		return nil, msgs.notInitialized unless DM
 
 		while 0 != DM.busy @manager
-			if nil != callback @progress!
+			unless callback @progress!
 				return
 			sleep!
 
-		-- This is horrible. Extracting errors from this is horrible. Why.
 		@failedCount = 0
 		for i = 1, @downloadCount
 			err = DM.getError @manager, i
