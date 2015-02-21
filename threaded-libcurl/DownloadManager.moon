@@ -9,15 +9,21 @@ sleep = ffi.os == "Windows" and ( (ms=100) -> ffi.C.Sleep ms ) or ( (ms=100) -> 
 
 class DownloadManager
 	DM = nil
+	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	freeManager = ( manager ) ->
 		DM.freeDM manager
 
-	new: ( libraryPath = "", library = "DownloadManager" ) =>
+	new: ( libraryPaths = defaultLibraryPaths ) =>
 		if nil == DM
-			success, DM = pcall ffi.load, libraryPath .. library
-			unless success
-				print "doof"
-			assert success, DM
+			libraryPaths = {libraryPaths} unless "table" == type libraryPaths
+			success = false
+			for path in *libraryPaths
+				success, DM = pcall ffi.load, path
+				break if success
+
+			error DM unless success
+
 		@manager = ffi.gc DM.newDM!, freeManager
 		@failed = {}
 		@downloads = 0
