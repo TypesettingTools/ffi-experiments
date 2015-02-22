@@ -96,15 +96,21 @@ class DownloadManager
 
 	addDownload: ( url, outfile, sha1 ) =>
 		return nil, msgs.notInitialized unless DM
+
 		unless url and outfile
 			return nil, msgs.addMissingArgs\format tostring(url), tostring(outfile)
 
-		dev, dir, file = outfile\match "^(#{ffi.os=='Windows' and '%a:[\\/]' or '[/~]'})(.*)[/\\](.*)$"
+		-- expand leading ~ ourselves.
+		if homeDir = os.getenv "HOME"
+			outfile = outfile\gsub "^~", homeDir .. "/"
 
-		-- check if outfile is a full path as we don't support relative ones or automatic file naming
-		if not dev or #dir<1 and dev != "~"
+		dev, dir, file = outfile\match "^(#{ffi.os=='Windows' and '%a:[\\/]' or '/'})(.*)[/\\](.*)$"
+
+		-- check that outfile is a full path as we don't support relative
+		-- ones or automatic file naming
+		if not dev or #dir < 1
 			return nil, msgs.outNoFullPath\format outfile
-		elseif #file<1
+		elseif #file < 1
 			return nil, msgs.outNoFile\format outfile
 
 		if havelfs
