@@ -54,6 +54,7 @@ Error Handling:
 
 ]]
 
+havelfs, lfs = pcall require, "lfs"
 ffi = require "ffi"
 ffi.cdef [[
 ___INCLUDE___
@@ -106,15 +107,18 @@ class DownloadManager
 		elseif #file<1
 			return nil, msgs.outNoFile\format outfile
 
-		dir = dev..dir
-		-- check if directory exists
-		mode, err = lfs.attributes dir, "mode"
-		if mode != "directory"
-			return nil, err if err -- lfs.attributes returns nil and no error if the folder wasn't found
-			-- create directory
-			res, err = lfs.mkdir dir
-			return nil, err if err -- lfs.mkdir returns nil on sucess and error alike
-
+		if havelfs
+			-- check that directory exists, but only if we have lfs.
+			dir = dev .. dir
+			mode, err = lfs.attributes dir, "mode"
+			if mode != "directory"
+				-- lfs.attributes returns nil and no error if the folder wasn't
+				-- found
+				return nil, err if err
+				-- create directory
+				res, err = lfs.mkdir dir
+				-- lfs.mkdir returns nil on success and error alike
+				return nil, err if err
 
 		DM.addDownload @manager, url, outfile, sha1
 		@downloadCount += 1
