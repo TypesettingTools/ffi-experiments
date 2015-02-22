@@ -57,11 +57,11 @@ Error Handling:
 ffi = require "ffi"
 ffi.cdef [[
 ___INCLUDE___
-int usleep(unsigned int useconds);
-void Sleep(unsigned long dwMilliseconds);
+int usleep(unsigned int);
+void Sleep(unsigned long);
 ]]
 
-sleep = ffi.os == "Windows" and ( (ms=100) -> ffi.C.Sleep ms ) or ( (ms=100) -> ffi.C.usleep ms*1000 )
+sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
 class DownloadManager
 	DM = nil
@@ -78,7 +78,7 @@ class DownloadManager
 		DM.freeDM manager
 
 	new: ( libraryPaths = defaultLibraryPaths ) =>
-		if nil == DM
+		unless DM
 			libraryPaths = {libraryPaths} unless "table" == type libraryPaths
 			success = false
 			for path in *libraryPaths
