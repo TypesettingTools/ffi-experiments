@@ -85,6 +85,7 @@ void Downloader::finalize( void ) {
 }
 
 void Downloader::process( void ) {
+	char curlError[CURL_ERROR_SIZE];
 	CURL *curl = curl_easy_init( );
 	if ( NULL == curl ) {
 		error = "Could not initialize curl.";
@@ -120,6 +121,10 @@ void Downloader::process( void ) {
 		error = "Could not set fetch url.";
 		goto fail;
 	}
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_ERRORBUFFER, curlError )) {
+		error = "Could not set error buffer.";
+		goto fail;
+	}
 
 	switch (curl_easy_perform( curl )) {
 	case CURLE_OK:
@@ -134,7 +139,7 @@ void Downloader::process( void ) {
 		goto fail;
 
 	default:
-		error = "The download could not be completed.";
+		error = std::string( curlError );
 		goto fail;
 	}
 
