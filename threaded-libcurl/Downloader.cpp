@@ -56,7 +56,7 @@ size_t Downloader::writeCallback( const char *buffer, size_t size ) {
 		// blame. Easiest fix is to append before hashing.
 		SHA1_Update( &sha1ctx, reinterpret_cast<const uint8_t*>(buffer), size );
 	}
-	return terminated? size - 1: size;
+	return size;
 }
 
 void Downloader::finalize( void ) {
@@ -117,8 +117,20 @@ void Downloader::process( void ) {
 		goto fail;
 	}
 
-	if (curl_easy_perform( curl )) {
-		error = "Could not perform download.";
+	switch (curl_easy_perform( curl )) {
+	case 0:
+		break;
+
+	case CURLE_ABORTED_BY_CALLBACK:
+		error = "User aborted.";
+		goto fail;
+
+	case CURLE_WRITE_ERROR:
+		error = "A write error occurred.";
+		goto fail;
+
+	default:
+		error = "The download could not be completed.";
 		goto fail;
 	}
 
