@@ -94,6 +94,7 @@ class DownloadManager
 		@error = {}
 
 	addDownload: ( url, outfile, sha1 ) =>
+		return nil, msgs.notInitialized unless DM
 		unless url and outfile
 			return nil, msgs.addMissingArgs\format tostring(url), tostring(outfile)
 
@@ -114,7 +115,6 @@ class DownloadManager
 			res, err = lfs.mkdir dir
 			return nil, err if err -- lfs.mkdir returns nil on sucess and error alike
 
-		return nil, msgs.notInitialized unless DM
 
 		DM.addDownload @manager, url, outfile, sha1
 		@downloadCount += 1
