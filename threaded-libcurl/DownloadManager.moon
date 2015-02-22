@@ -164,3 +164,13 @@ class DownloadManager
 				@failedCount +=1
 				@failedDownloads[@failedCount] = i
 				@error[i] = ffi.string err
+
+	-- These could be class methods rather than instance methods, but
+	-- since DM has to be initialized for them to work, it's easier to
+	-- just make them instance methods than trying to juggle the DM init.
+	-- Also make them fat arrow functions for calling consistency.
+	checkFileSHA1: ( filename, expected ) =>
+		DM.checkFileSHA1 filename, expected
+
+	checkStringSHA1: ( string, expected ) =>
+		DM.checkStringSHA1 filename, expected
