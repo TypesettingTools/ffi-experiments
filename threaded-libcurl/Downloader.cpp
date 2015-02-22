@@ -112,6 +112,10 @@ void Downloader::process( void ) {
 		error = "Could not set progress callback.";
 		goto fail;
 	}
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_FAILONERROR, 1 ) ) {
+		error = "Could not fail on error.";
+		goto fail;
+	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_URL, url.c_str( ) )) {
 		error = "Could not set fetch url.";
 		goto fail;
