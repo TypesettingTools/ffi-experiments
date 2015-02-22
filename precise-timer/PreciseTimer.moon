@@ -1,44 +1,35 @@
-PreciseTimer, PT = "PreciseTimer"
+ffi = require "ffi"
+ffi.cdef [[
+___INCLUDE___
+int usleep(unsigned int);
+void Sleep(unsigned long);
+]]
 
-haveFFI, ffi = pcall require, "ffi"
-if haveFFI
-	if aegisub
-		libPath= "/automation/include/#{PreciseTimer}/#{PreciseTimer}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
-		haveFFI, PT = pcall ffi.load, aegisub.decode_path "?user"..libPath
-		unless haveFFI
-			haveFFI, PT = pcall ffi.load, aegisub.decode_path "?data"..libPath
-	else
-		haveFFI, PT = pcall ffi.load, PreciseTimer
+class PreciseTimer
+	PT = nil
+	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	defaultLibraryPaths = aegisub and {aegisub.decode_path( "?user"..pathExt ), aegisub.decode_path( "?data"..pathExt )} or {@__name}
 
-unless haveFFI
-	class PreciseTimer
-		new: =>
-			@startTime = os.time!
+	freeTimer = ( timer ) ->
+		PT.freeTimer timer
 
-		timeElapsed: =>
-			return os.time! - @startTime
+	new: ( libraryPaths = defaultLibraryPaths ) =>
+		unless PT
+			libraryPaths = { libraryPaths } unless "table" == type libraryPaths
+			success = false
+			for path in *libraryPaths
+				success, PT = pcall ffi.load, path
+				break if success
 
-else
-	ffi.cdef [[
-		___INCLUDE___
-void Sleep(int ms);
-int poll(struct pollfd *fds, unsigned long nfds, int timeout);
-	]]
+			error PT unless success
 
-	class PreciseTimer
-		freeTimer = ( timer ) ->
-			PT.freeTimer timer
+		@timer = ffi.gc PT.startTimer!, freeTimer
 
-		new: =>
-			@timer = ffi.gc PT.startTimer!, freeTimer
+	timeElapsed: =>
+		return PT.getDuration @timer
 
-		timeElapsed: =>
-			return PT.getDuration @timer
+	sleep: ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
-		sleep: ffi.os == "Windows" and ( (ms) => ffi.C.Sleep ms ) or ( (ms) => ffi.C.poll nil, 0, s*1000 )
-
--- ffi.cdef "int usleep( unsigned int usec );"
-
--- timer = PreciseTimer!
--- ffi.C.usleep 100000
--- print tostring timer\timeElapsed!
+timer = PreciseTimer!
+timer.sleep 500
+print tostring timer\timeElapsed!
