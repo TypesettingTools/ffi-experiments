@@ -44,7 +44,7 @@ Downloader::Downloader( std::string theUrl, std::string theOutfile, std::string 
 int Downloader::progressCallback( curl_off_t dltotal, curl_off_t dlnow ) {
 	current = dlnow;
 	total = dltotal;
-	return terminated? 1: 0;
+	return terminated? !CURLE_OK: CURLE_OK;
 }
 
 size_t Downloader::writeCallback( const char *buffer, size_t size ) {
@@ -92,33 +92,33 @@ void Downloader::process( void ) {
 		goto exit;
 	}
 
-	if (curl_easy_setopt( curl, CURLOPT_WRITEDATA, this )) {
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_WRITEDATA, this )) {
 		error = "Could not set write callback.";
 		goto fail;
 	}
-	if (curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, curlWriteCallback )) {
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, curlWriteCallback )) {
 		error = "Could not set write callback.";
 		goto fail;
 	}
-	if (curl_easy_setopt( curl, CURLOPT_NOPROGRESS, 0 )) {
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_NOPROGRESS, 0 )) {
 		error = "Could not enable progress callback????";
 		goto fail;
 	}
-	if (curl_easy_setopt( curl, CURLOPT_XFERINFODATA, this )) {
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_XFERINFODATA, this )) {
 		error = "Could not set progress callback.";
 		goto fail;
 	}
-	if (curl_easy_setopt( curl, CURLOPT_XFERINFOFUNCTION, curlProgressCallback )) {
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_XFERINFOFUNCTION, curlProgressCallback )) {
 		error = "Could not set progress callback.";
 		goto fail;
 	}
-	if (curl_easy_setopt( curl, CURLOPT_URL, url.c_str( ) )) {
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_URL, url.c_str( ) )) {
 		error = "Could not set fetch url.";
 		goto fail;
 	}
 
 	switch (curl_easy_perform( curl )) {
-	case 0:
+	case CURLE_OK:
 		break;
 
 	case CURLE_ABORTED_BY_CALLBACK:
