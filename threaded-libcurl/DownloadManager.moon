@@ -15,8 +15,8 @@
 	If you have a SHA-1 hash to check the downloaded file against, use:
 		manager\addDownload "https://a.real.website", "out2", "b52854d1f79de5ebeebf0160447a09c7a8c2cde4"
 
-	You may want to keep the ID of your download to check its result later:
-		id = manager\addDownload "https://a.real.website", "out2",
+	You may want to keep a reference of your download to check its result later:
+		myDownload = manager\addDownload "https://a.real.website", "out2",
 
 	Downloads will start immediately. Do whatever you want here while downloads happen in the background.
 	The output file must contain a full path and file name. There is no working directory and automatic file naming is unsupported.
@@ -33,18 +33,20 @@
 4. Check for download errors:
 
 	Check a specific download:
-		if manager\error[id]
-			error manager\error[id]
+		error dl.error if dl.error
 
-	Get a list of failed downloads:
-		for id in *manager.failedDownloads
-			print "Download #{id} error: #{manager.error[id]}"
+	Print all failed downloads:
+		for dl in *manager.failedDownloads
+			print "Download ##{dl.id} error: #{dl.error}"
+
+	Get a descriptive overall error message:
+		error = table.concat ["#{dl.url}: #{dl.error}" for dl in *manager.failedDownloads], "\n"
 
 5. Clear all downloads:
 
 	manager\clear!
 
-	Removes all downloads as well as results/error messages, so previous IDs become invalid.
+	Removes all downloads from the downloader and resets all counters.
 
 
 Error Handling:
@@ -89,10 +91,10 @@ class DownloadManager
 			error DM unless success
 
 		@manager = ffi.gc DM.newDM!, freeManager
+		@downloads = {}
 		@failedDownloads = {}
 		@downloadCount = 0
 		@failedCount = 0
-		@error = {}
 
 	addDownload: ( url, outfile, sha1 ) =>
 		return nil, msgs.notInitialized unless DM
@@ -128,7 +130,8 @@ class DownloadManager
 
 		DM.addDownload @manager, url, outfile, sha1
 		@downloadCount += 1
-		return @downloadCount
+		@downloads[@downloadCount] = id:@downloadCount, :url, :outfile, :sha1
+		return @downloads[@downloadCount]
 
 	progress: =>
 		return nil, msgs.notInitialized unless DM
@@ -144,10 +147,10 @@ class DownloadManager
 		return nil, msgs.notInitialized unless DM
 
 		DM.clear @manager
+		@downloads = {}
 		@failedDownloads = {}
 		@downloadCount = 0
 		@failedCount = 0
-		@error = {}
 
 	waitForFinish: ( callback ) =>
 		return nil, msgs.notInitialized unless DM
@@ -162,8 +165,8 @@ class DownloadManager
 			err = DM.getError @manager, i
 			if nil != err
 				@failedCount +=1
-				@failedDownloads[@failedCount] = i
-				@error[i] = ffi.string err
+				@failedDownloads[@failedCount] = @downloads[i]
+				@downloads[i].error = ffi.string err
 
 	-- These could be class methods rather than instance methods, but
 	-- since DM has to be initialized for them to work, it's easier to
