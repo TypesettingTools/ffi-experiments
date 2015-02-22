@@ -29,7 +29,3 @@ class PreciseTimer
 		return PT.getDuration @timer
 
 	sleep: ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
-
-timer = PreciseTimer!
-timer.sleep 500
-print tostring timer\timeElapsed!
