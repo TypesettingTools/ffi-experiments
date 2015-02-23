@@ -71,6 +71,7 @@ class DownloadManager
 	@version_string = "0.1.0"
 
 	DM = nil
+	DMVersion = 0x000100
 	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	msgs = {
@@ -91,7 +92,12 @@ class DownloadManager
 				success, DM = pcall ffi.load, path
 				break if success
 
-			error DM unless success
+			if success
+				libVer = DM.version!
+				if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
+					error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
+
+			assert success, DM
 
 		@manager = ffi.gc DM.newDM!, freeManager
 		@downloads = {}

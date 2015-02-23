@@ -10,6 +10,7 @@ class PreciseTimer
 	@version_string = "0.1.0"
 
 	PT = nil
+	PTVersion = 0x000100
 	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path( "?user"..pathExt ), aegisub.decode_path( "?data"..pathExt )} or {@__name}
 
@@ -24,7 +25,12 @@ class PreciseTimer
 				success, PT = pcall ffi.load, path
 				break if success
 
-			error PT unless success
+			if success
+				libVer = PT.version!
+				if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/65536%256)
+					error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
+
+			assert success, PT
 
 		@timer = ffi.gc PT.startTimer!, freeTimer
 
