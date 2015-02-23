@@ -48,6 +48,10 @@ extern "C" {
 		return DownloadManager::checkStringSHA1( std::string( string ), std::string( expected ) );
 	}
 
+	uint version( void ) {
+		return DownloadManager::version;
+	}
+
 	void freeDM( CDlM* mgr ) {
 		delete reinterpret_cast<DownloadManager*>(mgr);
 	}

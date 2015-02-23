@@ -9,6 +9,10 @@ extern "C" {
 		return reinterpret_cast<PreciseTimer*>(pt)->getElapsedTime( );
 	}
 
+	unsigned int version( void ) {
+		return PreciseTimer::version;
+	}
+
 	void freeTimer( CPT *pt ) {
 		delete reinterpret_cast<PreciseTimer*>(pt);
 	}

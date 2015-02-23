@@ -10,6 +10,7 @@ typedef struct CPT CPT;
 
 CPT* startTimer( void );
 double getDuration( CPT *pt );
+unsigned int version( void );
 void freeTimer( CPT *pt );
 
 #ifdef __cplusplus

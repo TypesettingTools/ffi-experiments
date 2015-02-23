@@ -20,6 +20,7 @@ void        terminate      ( CDlM *mgr );
 void        clear          ( CDlM *mgr );
 int         checkFileSHA1  ( const char *filename, const char *expected );
 int         checkStringSHA1( const char *string, const char *expected );
+uint        version        ( void );
 void        freeDM         ( CDlM *mgr );
 
 #ifdef __cplusplus
