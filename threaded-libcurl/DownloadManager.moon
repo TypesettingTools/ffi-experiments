@@ -67,8 +67,8 @@ void Sleep(unsigned long);
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
 class DownloadManager
-	@version = 0x000100
-	@version_string = "0.1.0"
+	@version = 0x000101
+	@version_string = "0.1.1"
 
 	DM = nil
 	DMVersion = 0x000100
@@ -182,7 +182,17 @@ class DownloadManager
 	-- just make them instance methods than trying to juggle the DM init.
 	-- Also make them fat arrow functions for calling consistency.
 	checkFileSHA1: ( filename, expected ) =>
-		DM.checkFileSHA1 filename, expected
+		switch DM.checkFileSHA1 filename, expected
+			when -1
+				return nil
+			when 0
+				return true
+			when 1
+				return false
 
 	checkStringSHA1: ( string, expected ) =>
-		DM.checkStringSHA1 filename, expected
+		switch DM.checkStringSHA1 filename, expected
+			when 0
+				return true
+			when 1
+				return false
