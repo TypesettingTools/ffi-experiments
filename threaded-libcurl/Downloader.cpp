@@ -73,7 +73,7 @@ void Downloader::finalize( void ) {
 		}
 	}
 
-	std::fstream outStream( outfile, std::fstream::out );
+	std::fstream outStream( outfile, std::ios::out | std::ios::binary );
 	if (outStream.fail( )) {
 		error = "Couldn't open output file: " + outfile;
 		failed = true;

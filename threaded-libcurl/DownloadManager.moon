@@ -71,7 +71,7 @@ class DownloadManager
 	@version_string = "0.1.2"
 
 	DM = nil
-	DMVersion = 0x000100
+	DMVersion = 0x000101
 	pathExt = "/automation/include/#{@__name}/#{(ffi.os != windows) and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	msgs = {
