@@ -1,4 +1,4 @@
-[[   ---------- Usage ----------
+[[---------- Usage ----------
 
 1. Create a DownloadManager:
 
@@ -67,11 +67,11 @@ void Sleep(unsigned long);
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
 class DownloadManager
-	@version = 0x000103
-	@version_string = "0.1.3"
+	@version = 0x000104
+	@version_string = "0.1.4"
 
 	DM = nil
-	DMVersion = 0x000101
+	DMVersion = 0x000102
 	pathExt = "/automation/include/#{@__name}/#{(ffi.os != 'Windows') and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	msgs = {
@@ -137,6 +137,10 @@ class DownloadManager
 				-- lfs.mkdir returns nil on success and error alike
 				return nil, err if err
 
+		-- make sure sha1 is lowercase for comparison.
+		if sha1
+			sha1 = sha1\lower!
+
 		DM.addDownload @manager, url, outfile, sha1
 		@downloadCount += 1
 		@downloads[@downloadCount] = id:@downloadCount, :url, :outfile, :sha1
@@ -182,17 +186,17 @@ class DownloadManager
 	-- just make them instance methods than trying to juggle the DM init.
 	-- Also make them fat arrow functions for calling consistency.
 	checkFileSHA1: ( filename, expected ) =>
-		switch DM.checkFileSHA1 filename, expected
-			when -1
-				return nil
-			when 0
-				return true
-			when 1
-				return false
+		result = DM.getFileSHA1 filename
+		if nil == result
+			return nil, "Could not open file #{filename}."
+		if result == expected\lower!
+			return true
+		else
+			return false, "Hash mismatch. Got #{result}, expected #{expected}."
 
 	checkStringSHA1: ( string, expected ) =>
-		switch DM.checkStringSHA1 filename, expected
-			when 0
-				return true
-			when 1
-				return false
+		result = DM.getStringSHA1 string
+		if result == expected\lower!
+			return true
+		else
+			return false, "Hash mismatch. Got #{result}, expected #{expected}."

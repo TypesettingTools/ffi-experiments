@@ -40,12 +40,16 @@ extern "C" {
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
-	EXPORT int checkFileSHA1( const char *filename, const char *expected ) {
-		return DownloadManager::checkFileSHA1( std::string( filename ), std::string( expected ) );
+	EXPORT const char* getFileSHA1( const char *filename ) {
+		auto result = DownloadManager::getFileSHA1( std::string( filename ) );
+		if ( "" == result )
+			return NULL;
+
+		return result.c_str( );
 	}
 
-	EXPORT int checkStringSHA1( const char *string, const char *expected ) {
-		return DownloadManager::checkStringSHA1( std::string( string ), std::string( expected ) );
+	EXPORT const char* getStringSHA1( const char *string ) {
+		return DownloadManager::getStringSHA1( std::string( string ) ).c_str( );
 	}
 
 	EXPORT uint version( void ) {

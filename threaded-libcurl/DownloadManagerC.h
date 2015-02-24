@@ -15,19 +15,19 @@ struct CDlM;
 typedef struct CDlM CDlM;
 typedef unsigned int uint;
 
-EXPORT CDlM*       newDM          ( void );
-EXPORT uint        addDownload    ( CDlM *mgr,           const char *url,
-                             const char *outfile, const char *sha1 );
-EXPORT double      progress       ( CDlM *mgr );
-EXPORT int         busy           ( CDlM *mgr );
-EXPORT int         checkDownload  ( CDlM *mgr, uint i );
-EXPORT const char* getError       ( CDlM *mgr, uint i );
-EXPORT void        terminate      ( CDlM *mgr );
-EXPORT void        clear          ( CDlM *mgr );
-EXPORT int         checkFileSHA1  ( const char *filename, const char *expected );
-EXPORT int         checkStringSHA1( const char *string, const char *expected );
-EXPORT uint        version        ( void );
-EXPORT void        freeDM         ( CDlM *mgr );
+EXPORT CDlM*       newDM        ( void );
+EXPORT uint        addDownload  ( CDlM *mgr,           const char *url,
+                                  const char *outfile, const char *sha1 );
+EXPORT double      progress     ( CDlM *mgr );
+EXPORT int         busy         ( CDlM *mgr );
+EXPORT int         checkDownload( CDlM *mgr, uint i );
+EXPORT const char* getError     ( CDlM *mgr, uint i );
+EXPORT void        terminate    ( CDlM *mgr );
+EXPORT void        clear        ( CDlM *mgr );
+EXPORT const char* getFileSHA1  ( const char *filename );
+EXPORT const char* getStringSHA1( const char *string );
+EXPORT uint        version      ( void );
+EXPORT void        freeDM       ( CDlM *mgr );
 
 #ifdef __cplusplus
 }

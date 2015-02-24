@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <cstdint>
 #include <cstdio>
 
@@ -13,7 +14,7 @@ static int curlProgressCallback( void *userdata, curl_off_t dltotal, curl_off_t 
 	return static_cast<Downloader*>(userdata)->progressCallback( dltotal, dlnow );
 }
 
-int sha1compare( uint8_t digest[SHA1_DIGEST_SIZE], const std::string sha1 ) {
+std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	char hash[41];
 	for( unsigned int offset = 0; offset < SHA1_DIGEST_SIZE; offset++ ) {
 #ifdef _WIN32
@@ -22,7 +23,7 @@ int sha1compare( uint8_t digest[SHA1_DIGEST_SIZE], const std::string sha1 ) {
 		snprintf( hash + 2*offset, 3, "%02x", digest[offset] );
 #endif // _WIN32
 	}
-	return (std::string(hash) != sha1);
+	return std::string(hash);
 }
 
 Downloader::Downloader( std::string theUrl, std::string theOutfile ) {
@@ -66,8 +67,11 @@ void Downloader::finalize( void ) {
 	if (hasSHA1) {
 		uint8_t digest[SHA1_DIGEST_SIZE];
 		SHA1_Final( &sha1ctx, digest );
-		if (sha1compare( digest, sha1 )) {
-			error = "sha1 mismatch.";
+		auto result = digestToHex( digest );
+		if ( result != sha1 ) {
+			std::ostringstream fmtStr("Hash mismatch. Got ");
+			fmtStr << result << ", expected " << sha1;
+			error = fmtStr.str( );
 			failed = true;
 			return;
 		}

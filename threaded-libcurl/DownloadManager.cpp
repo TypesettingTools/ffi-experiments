@@ -89,7 +89,7 @@ int DownloadManager::busy( void ) {
 
 // These are kind of out of place but they are useful.
 
-int DownloadManager::checkFileSHA1( const std::string filename, const std::string expected ) {
+std::string DownloadManager::getFileSHA1( const std::string filename ) {
 	std::string buffer;
 	std::fstream inFile( filename, std::ios::in | std::ios::binary | std::ios::ate );
 	if (inFile.is_open( )) {
@@ -97,18 +97,18 @@ int DownloadManager::checkFileSHA1( const std::string filename, const std::strin
 		inFile.seekg( 0, std::ios::beg );
 		inFile.read( &buffer[0], buffer.size( ) );
 		inFile.close( );
-		return checkStringSHA1( buffer, expected );
+		return getStringSHA1( buffer );
 	}
-	return -1;
+	return "";
 }
 
-int DownloadManager::checkStringSHA1( const std::string string, const std::string expected ) {
+std::string DownloadManager::getStringSHA1( const std::string string ) {
 	SHA1_CTX ctx;
 	uint8_t digest[SHA1_DIGEST_SIZE];
 	SHA1_Init( &ctx );
 	SHA1_Update( &ctx, reinterpret_cast<const uint8_t*>(string.c_str( )), string.size( ) );
 	SHA1_Final( &ctx, digest );
-	return sha1compare( digest, expected );
+	return digestToHex( digest );
 }
 
 /*

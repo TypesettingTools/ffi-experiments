@@ -9,7 +9,7 @@ class DownloadManager {
 	unsigned int finishedCount = 0, addedCount = 0, failedCount = 0;
 
 	public:
-		const static unsigned int version = 0x000101;
+		const static unsigned int version = 0x000102;
 		DownloadManager( void );
 		~DownloadManager( void );
 		double getProgress( void );
@@ -20,6 +20,6 @@ class DownloadManager {
 		void terminate( void );
 		void clear( void );
 		int busy( void );
-		static int checkFileSHA1( std::string filename, std::string expected );
-		static int checkStringSHA1( std::string string, std::string expecteds );
+		static std::string getFileSHA1( std::string filename );
+		static std::string getStringSHA1( std::string string );
 };
