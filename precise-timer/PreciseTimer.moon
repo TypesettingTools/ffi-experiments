@@ -6,12 +6,12 @@ void Sleep(unsigned long);
 ]]
 
 class PreciseTimer
-	@version = 0x000100
-	@version_string = "0.1.0"
+	@version = 0x000101
+	@version_string = "0.1.1"
 
 	PT = nil
 	PTVersion = 0x000100
-	pathExt = "/automation/include/#{@__name}/#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	pathExt = "/automation/include/#{@__name}/#{(ffi.os != windows) and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path( "?user"..pathExt ), aegisub.decode_path( "?data"..pathExt )} or {@__name}
 
 	freeTimer = ( timer ) ->
