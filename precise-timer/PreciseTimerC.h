@@ -1,6 +1,12 @@
 #ifndef PRECISETIMERC_H
 #define PRECISETIMERC_H
 
+#ifdef _WIN32
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif /*_WIN32*/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -8,10 +14,10 @@ extern "C" {
 struct CPT;
 typedef struct CPT CPT;
 
-CPT* startTimer( void );
-double getDuration( CPT *pt );
-unsigned int version( void );
-void freeTimer( CPT *pt );
+EXPORT CPT* startTimer( void );
+EXPORT double getDuration( CPT *pt );
+EXPORT unsigned int version( void );
+EXPORT void freeTimer( CPT *pt );
 
 #ifdef __cplusplus
 }

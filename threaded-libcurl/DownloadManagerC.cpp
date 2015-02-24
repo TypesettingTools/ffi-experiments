@@ -4,11 +4,11 @@
 
 // Avoid symbol mangling.
 extern "C" {
-	CDlM *newDM( void ) {
+	EXPORT CDlM *newDM( void ) {
 		return reinterpret_cast<CDlM*>(new DownloadManager);
 	}
 
-	uint addDownload( CDlM *mgr, const char *url, const char *outfile, const char *sha1) {
+	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outfile, const char *sha1) {
 		if (NULL == sha1) {
 			return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile) );
 		} else {
@@ -16,43 +16,43 @@ extern "C" {
 		}
 	}
 
-	double progress( CDlM *mgr ) {
+	EXPORT double progress( CDlM *mgr ) {
 		return reinterpret_cast<DownloadManager*>(mgr)->getProgress( );
 	}
 
-	int busy( CDlM *mgr ) {
+	EXPORT int busy( CDlM *mgr ) {
 		return reinterpret_cast<DownloadManager*>(mgr)->busy( );
 	}
 
-	int checkDownload( CDlM *mgr, uint i ) {
+	EXPORT int checkDownload( CDlM *mgr, uint i ) {
 		return reinterpret_cast<DownloadManager*>(mgr)->checkDownload( i );
 	}
 
-	const char* getError( CDlM *mgr, uint i ) {
+	EXPORT const char* getError( CDlM *mgr, uint i ) {
 		return reinterpret_cast<DownloadManager*>(mgr)->getError( i );
 	}
 
-	void terminate( CDlM *mgr ) {
+	EXPORT void terminate( CDlM *mgr ) {
 		reinterpret_cast<DownloadManager*>(mgr)->terminate( );
 	}
 
-	void clear( CDlM *mgr ) {
+	EXPORT void clear( CDlM *mgr ) {
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
-	int checkFileSHA1( const char *filename, const char *expected ) {
+	EXPORT int checkFileSHA1( const char *filename, const char *expected ) {
 		return DownloadManager::checkFileSHA1( std::string( filename ), std::string( expected ) );
 	}
 
-	int checkStringSHA1( const char *string, const char *expected ) {
+	EXPORT int checkStringSHA1( const char *string, const char *expected ) {
 		return DownloadManager::checkStringSHA1( std::string( string ), std::string( expected ) );
 	}
 
-	uint version( void ) {
+	EXPORT uint version( void ) {
 		return DownloadManager::version;
 	}
 
-	void freeDM( CDlM* mgr ) {
+	EXPORT void freeDM( CDlM* mgr ) {
 		delete reinterpret_cast<DownloadManager*>(mgr);
 	}
 }

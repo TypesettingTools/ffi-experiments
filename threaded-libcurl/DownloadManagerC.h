@@ -1,6 +1,12 @@
 #ifndef DOWNLOADMANAGERC_H
 #define DOWNLOADMANAGERC_H
 
+#ifdef _WIN32
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif /*_WIN32*/
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -9,19 +15,19 @@ struct CDlM;
 typedef struct CDlM CDlM;
 typedef unsigned int uint;
 
-CDlM*       newDM          ( void );
-uint        addDownload    ( CDlM *mgr,           const char *url,
+EXPORT CDlM*       newDM          ( void );
+EXPORT uint        addDownload    ( CDlM *mgr,           const char *url,
                              const char *outfile, const char *sha1 );
-double      progress       ( CDlM *mgr );
-int         busy           ( CDlM *mgr );
-int         checkDownload  ( CDlM *mgr, uint i );
-const char* getError       ( CDlM *mgr, uint i );
-void        terminate      ( CDlM *mgr );
-void        clear          ( CDlM *mgr );
-int         checkFileSHA1  ( const char *filename, const char *expected );
-int         checkStringSHA1( const char *string, const char *expected );
-uint        version        ( void );
-void        freeDM         ( CDlM *mgr );
+EXPORT double      progress       ( CDlM *mgr );
+EXPORT int         busy           ( CDlM *mgr );
+EXPORT int         checkDownload  ( CDlM *mgr, uint i );
+EXPORT const char* getError       ( CDlM *mgr, uint i );
+EXPORT void        terminate      ( CDlM *mgr );
+EXPORT void        clear          ( CDlM *mgr );
+EXPORT int         checkFileSHA1  ( const char *filename, const char *expected );
+EXPORT int         checkStringSHA1( const char *string, const char *expected );
+EXPORT uint        version        ( void );
+EXPORT void        freeDM         ( CDlM *mgr );
 
 #ifdef __cplusplus
 }

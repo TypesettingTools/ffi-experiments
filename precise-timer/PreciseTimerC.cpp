@@ -1,19 +1,19 @@
 #include "PreciseTimer.hpp"
 #include "PreciseTimerC.h"
 extern "C" {
-	CPT* startTimer( void ) {
+	EXPORT CPT* startTimer( void ) {
 		return reinterpret_cast<CPT*>(new PreciseTimer);
 	}
 
-	double getDuration( CPT *pt ) {
+	EXPORT double getDuration( CPT *pt ) {
 		return reinterpret_cast<PreciseTimer*>(pt)->getElapsedTime( );
 	}
 
-	unsigned int version( void ) {
+	EXPORT unsigned int version( void ) {
 		return PreciseTimer::version;
 	}
 
-	void freeTimer( CPT *pt ) {
+	EXPORT void freeTimer( CPT *pt ) {
 		delete reinterpret_cast<PreciseTimer*>(pt);
 	}
 }
