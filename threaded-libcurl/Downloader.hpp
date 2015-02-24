@@ -21,7 +21,7 @@ class Downloader {
 	public:
 		bool terminated = false, done = false, failed = false;
 	  std::string error;
-		curl_off_t current, total;
+		curl_off_t current = 0, total = 0;
 
 		Downloader( std::string theUrl, std::string theOutfile );
 		Downloader( std::string theUrl, std::string theOutfile, std::string theSha1 );
