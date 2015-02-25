@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <cstdint>
 #include <cstdio>
 
@@ -69,9 +68,7 @@ void Downloader::finalize( void ) {
 		SHA1_Final( &sha1ctx, digest );
 		auto result = digestToHex( digest );
 		if ( result != sha1 ) {
-			std::ostringstream fmtStr("Hash mismatch. Got ");
-			fmtStr << result << ", expected " << sha1;
-			error = fmtStr.str( );
+			error = "Hash mismatch. Got " + result + ", expected " + sha1;
 			failed = true;
 			return;
 		}
