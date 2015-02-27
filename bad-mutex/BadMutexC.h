@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 EXPORT void lock( void );
+EXPORT bool try_lock( void );
 EXPORT void unlock( void );
 
 #ifdef __cplusplus

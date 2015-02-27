@@ -16,5 +16,6 @@ assert success, BM
 
 return {
 	lock: BM.lock
+	tryLock: BM.try_lock
 	unlock: BM.unlock
 }
