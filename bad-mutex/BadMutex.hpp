@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <mutex>
 
 class BadMutex {
@@ -8,6 +9,8 @@ class BadMutex {
 		void unlock( void );
 		bool try_lock( void );
 	private:
+		static std::once_flag cFlag;
+		static std::unique_ptr<BadMutex> instance;
 		std::mutex mutex;
 		BadMutex( void );
 };

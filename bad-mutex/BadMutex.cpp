@@ -1,10 +1,15 @@
 #include "BadMutex.hpp"
 
+std::once_flag BadMutex::cFlag;
+std::unique_ptr<BadMutex> BadMutex::instance;
+
 BadMutex::BadMutex( void ) : mutex() {}
 
 BadMutex& BadMutex::getInstance( void ) {
-	static BadMutex instance;
-	return instance;
+	std::call_once( cFlag, [] {
+		instance.reset(new BadMutex);
+	});
+	return *instance.get( );
 }
 
 void BadMutex::lock( void ) {
