@@ -72,7 +72,7 @@ class DownloadManager
 
 	DM = nil
 	DMVersion = 0x000102
-	pathExt = "/automation/include/#{@__name}/#{(ffi.os != 'Windows') and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	pathExt = "/automation/include/DM/#{(ffi.os != 'Windows') and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	msgs = {
 		notInitialized: "#{@__name} not initialized.",
