@@ -15,7 +15,12 @@ for path in *libraryPaths
 assert success, BM
 
 return {
-	lock: BM.lock
-	tryLock: BM.try_lock
-	unlock: BM.unlock
+	lock: ->
+		BM.lock!
+
+	tryLock: ->
+		return BM.try_lock!
+
+	unlock: ->
+		BM.unlock!
 }
