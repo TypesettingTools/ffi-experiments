@@ -14,6 +14,7 @@ extern "C" {
 EXPORT void lock( void );
 EXPORT bool try_lock( void );
 EXPORT void unlock( void );
+EXPORT unsigned int version( void );
 
 #ifdef __cplusplus
 }

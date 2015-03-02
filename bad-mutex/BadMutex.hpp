@@ -4,6 +4,7 @@
 
 class BadMutex {
 	public:
+		const static unsigned int version = 0x000100;
 		static BadMutex& getInstance( void );
 		void lock( void );
 		void unlock( void );

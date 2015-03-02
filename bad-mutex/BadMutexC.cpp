@@ -13,4 +13,8 @@ extern "C" {
 	EXPORT void unlock( void ) {
 		BadMutex::getInstance().unlock();
 	}
+
+	EXPORT unsigned int version( void ) {
+		return BadMutex::version;
+	}
 }
