@@ -26,12 +26,12 @@ double DownloadManager::getProgress( void ) {
 	return (addedCount > 0)? progress/addedCount: 0;
 }
 
-unsigned int DownloadManager::addDownload( std::string url, std::string outfile ) {
+unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile ) {
 	downloaders.push_back( new Downloader( url, outfile ) );
 	return ++addedCount;
 }
 
-unsigned int DownloadManager::addDownload( std::string url, std::string outfile, std::string sha1 ) {
+unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile, const std::string &sha1 ) {
 	downloaders.push_back( new Downloader( url, outfile, sha1 ) );
 	return ++addedCount;
 }
@@ -89,7 +89,7 @@ int DownloadManager::busy( void ) {
 
 // These are kind of out of place but they are useful.
 
-std::string DownloadManager::getFileSHA1( const std::string filename ) {
+std::string DownloadManager::getFileSHA1( const std::string &filename ) {
 	std::string buffer;
 	std::fstream inFile( filename, std::ios::in | std::ios::binary | std::ios::ate );
 	if (inFile.is_open( )) {
@@ -102,7 +102,7 @@ std::string DownloadManager::getFileSHA1( const std::string filename ) {
 	return "";
 }
 
-std::string DownloadManager::getStringSHA1( const std::string string ) {
+std::string DownloadManager::getStringSHA1( const std::string &string ) {
 	SHA1_CTX ctx;
 	uint8_t digest[SHA1_DIGEST_SIZE];
 	SHA1_Init( &ctx );

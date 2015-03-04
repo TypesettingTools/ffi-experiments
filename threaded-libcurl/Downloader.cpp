@@ -25,13 +25,13 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	return std::string(hash);
 }
 
-Downloader::Downloader( std::string theUrl, std::string theOutfile ) {
+Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile ) {
 	url     = theUrl;
 	outfile = theOutfile;
 	thread = std::thread( &Downloader::process, this );
 }
 
-Downloader::Downloader( std::string theUrl, std::string theOutfile, std::string theSha1 ) {
+Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1 ) {
 	hasSHA1 = true;
 	url     = theUrl;
 	sha1    = theSha1;

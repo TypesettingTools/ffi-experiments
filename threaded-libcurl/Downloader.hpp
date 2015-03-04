@@ -23,8 +23,8 @@ class Downloader {
 	  std::string error;
 		curl_off_t current = 0, total = 0;
 
-		Downloader( std::string theUrl, std::string theOutfile );
-		Downloader( std::string theUrl, std::string theOutfile, std::string theSha1 );
+		Downloader( const std::string &theUrl, const std::string &theOutfile );
+		Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1 );
 		int progressCallback( curl_off_t dltotal, curl_off_t dlnow );
 		size_t writeCallback( const char *buffer, size_t size );
 		void process( void );
