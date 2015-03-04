@@ -67,11 +67,11 @@ void Sleep(unsigned long);
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
 class DownloadManager
-	@version = 0x000104
-	@version_string = "0.1.4"
+	@version = 0x000105
+	@version_string = "0.1.5"
 
 	DM = nil
-	DMVersion = 0x000102
+	DMVersion = 0x000103
 	pathExt = "/automation/include/DM/#{(ffi.os != 'Windows') and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
 	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
 	msgs = {

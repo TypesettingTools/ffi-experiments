@@ -9,7 +9,7 @@ class DownloadManager {
 	unsigned int finishedCount = 0, addedCount = 0, failedCount = 0;
 
 	public:
-		const static unsigned int version = 0x000102;
+		const static unsigned int version = 0x000103;
 		DownloadManager( void );
 		~DownloadManager( void );
 		double getProgress( void );
