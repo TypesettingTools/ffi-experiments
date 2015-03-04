@@ -122,6 +122,10 @@ void Downloader::process( void ) {
 		error = "Could not set fetch url.";
 		goto fail;
 	}
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_FOLLOWLOCATION, 1 ) ) {
+		error = "Could not set redirect following.";
+		goto fail;
+	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_ERRORBUFFER, curlError )) {
 		error = "Could not set error buffer.";
 		goto fail;
