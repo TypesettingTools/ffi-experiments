@@ -67,8 +67,8 @@ void Sleep(unsigned long);
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
 class DownloadManager
-	@version = 0x000105
-	@version_string = "0.1.5"
+	@version = 0x000106
+	@version_string = "0.1.6"
 
 	DM = nil
 	DMVersion = 0x000103
@@ -169,7 +169,7 @@ class DownloadManager
 		return nil, msgs.notInitialized unless DM
 
 		while 0 != DM.busy @manager
-			unless callback @progress!
+			if callback and not callback @progress!
 				return
 			sleep!
 
