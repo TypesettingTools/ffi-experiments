@@ -2,17 +2,34 @@ ffi = require "ffi"
 ffi.cdef [[
 ___INCLUDE___
 ]]
-local BM
+local BM, loadedLibraryPath
 __name = "BadMutex"
-pathExt = "/automation/include/BM/#{(ffi.os != 'Windows') and 'lib' or ''}#{__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
-libraryPaths = aegisub and {aegisub.decode_path( "?user"..pathExt ), aegisub.decode_path( "?data"..pathExt ), __name} or {__name}
+packagePaths = ( namespace, libraryName ) ->
+	paths = { }
+	fixedLibraryName = namespace .. "/" .. "#{(ffi.os != 'Windows') and 'lib' or ''}#{libraryName}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	package.path\gsub "([^;]+)", ( path ) ->
+		-- the init.lua paths are just dupes of other paths.
+		if path\match "/%?/init%.lua$"
+			return
+
+		path = path\gsub "//?%?%.lua$", "/"
+		table.insert paths, path .. fixedLibraryName
+
+	-- Add the untouched library name so that ffi will search system
+	-- library paths too.
+	table.insert paths, libraryName
+	return paths
+
+libraryPaths = packagePaths "BM", __name
 
 success = false
 for path in *libraryPaths
 	success, BM = pcall ffi.load, path
-	break if success
+	if success
+		loadedLibraryPath = path
+		break
 
-assert success, BM
+assert success, "Could not load #{__name} C library."
 
 BMVersion = 0x000100
 libVer = BM.version!
@@ -29,5 +46,6 @@ return {
 	unlock: ->
 		BM.unlock!
 
-	version: 0x000100
+	version: 0x000101
+	:loadedLibraryPath
 }

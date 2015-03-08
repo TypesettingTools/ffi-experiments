@@ -5,32 +5,54 @@ int usleep(unsigned int);
 void Sleep(unsigned long);
 ]]
 
+packagePaths = ( namespace, libraryName ) ->
+	paths = { }
+	fixedLibraryName = namespace .. "/" .. "#{(ffi.os != 'Windows') and 'lib' or ''}#{libraryName}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	package.path\gsub "([^;]+)", ( path ) ->
+		-- the init.lua paths are just dupes of other paths.
+		if path\match "/%?/init%.lua$"
+			return
+
+		path = path\gsub "//?%?%.lua$", "/"
+		table.insert paths, path .. fixedLibraryName
+
+	-- Add the untouched library name so that ffi will search system
+	-- library paths too.
+	table.insert paths, libraryName
+	return paths
+
 class PreciseTimer
-	@version = 0x000102
-	@version_string = "0.1.2"
+	@version = 0x000103
+	@version_string = "0.1.3"
 
 	PT = nil
 	PTVersion = 0x000100
-	pathExt = "/automation/include/PT/#{(ffi.os != 'Windows') and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
-	defaultLibraryPaths = aegisub and {aegisub.decode_path( "?user"..pathExt ), aegisub.decode_path( "?data"..pathExt )} or {@__name}
 
 	freeTimer = ( timer ) ->
 		PT.freeTimer timer
 
-	new: ( libraryPaths = defaultLibraryPaths ) =>
+	new: ( additionalPaths = { } ) =>
+		unless "table" == type additionalPaths
+			additionalPaths = { tostring additionalPaths }
+
+		libraryPaths = packagePaths "PT", @@__name
+		for path in *additionalPaths
+			table.insert libraryPaths, path
+
 		unless PT
-			libraryPaths = { libraryPaths } unless "table" == type libraryPaths
 			success = false
 			for path in *libraryPaths
 				success, PT = pcall ffi.load, path
-				break if success
+				if success
+					@loadedLibraryPath = path
+					break
 
 			if success
 				libVer = PT.version!
 				if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/65536%256)
 					error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
 
-			assert success, PT
+			assert success, "Could not load #{@@__name} C library."
 
 		@timer = ffi.gc PT.startTimer!, freeTimer
 

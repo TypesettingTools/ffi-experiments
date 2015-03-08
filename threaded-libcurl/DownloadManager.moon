@@ -65,15 +65,29 @@ void Sleep(unsigned long);
 ]]
 
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
+packagePaths = ( namespace, libraryName ) ->
+	paths = { }
+	fixedLibraryName = namespace .. "/" .. "#{(ffi.os != 'Windows') and 'lib' or ''}#{libraryName}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
+	package.path\gsub "([^;]+)", ( path ) ->
+		-- the init.lua paths are just dupes of other paths.
+		if path\match "/%?/init%.lua$"
+			return
+
+		path = path\gsub "//?%?%.lua$", "/"
+		table.insert paths, path .. fixedLibraryName
+
+	-- Add the untouched library name so that ffi will search system
+	-- library paths too.
+	table.insert paths, libraryName
+	return paths
 
 class DownloadManager
-	@version = 0x000106
-	@version_string = "0.1.6"
+	@version = 0x000107
+	@version_string = "0.1.7"
 
 	DM = nil
 	DMVersion = 0x000103
-	pathExt = "/automation/include/DM/#{(ffi.os != 'Windows') and 'lib' or ''}#{@__name}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
-	defaultLibraryPaths = aegisub and {aegisub.decode_path("?user"..pathExt), aegisub.decode_path("?data"..pathExt)} or {@__name}
+
 	msgs = {
 		notInitialized: "#{@__name} not initialized.",
 		addMissingArgs: "Arguments #1 (url) and #2 (outfile) must not be nil, got url=%s, outfile=%s.",
@@ -84,26 +98,34 @@ class DownloadManager
 	freeManager = ( manager ) ->
 		DM.freeDM manager
 
-	new: ( libraryPaths = defaultLibraryPaths ) =>
+	new: ( additionalPaths = { } ) =>
+		unless "table" == type additionalPaths
+			additionalPaths = { tostring additionalPaths }
+
+		libraryPaths = packagePaths "DM", @@__name
+		for path in *additionalPaths
+			table.insert libraryPaths, path
+
 		unless DM
-			libraryPaths = {libraryPaths} unless "table" == type libraryPaths
 			success = false
 			for path in *libraryPaths
 				success, DM = pcall ffi.load, path
-				break if success
+				if success
+					@loadedLibraryPath = path
+					break
 
 			if success
 				libVer = DM.version!
 				if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
 					error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
 
-			assert success, DM
+			assert success, "Could not load #{@@__name} C library."
 
 		@manager = ffi.gc DM.newDM!, freeManager
-		@downloads = {}
-		@failedDownloads = {}
-		@downloadCount = 0
-		@failedCount = 0
+		@downloads       = { }
+		@downloadCount   = 0
+		@failedDownloads = { }
+		@failedCount     = 0
 
 	addDownload: ( url, outfile, sha1 ) =>
 		return nil, msgs.notInitialized unless DM
