@@ -212,7 +212,7 @@ class DownloadManager
 		filenameType, expectedType = type(filename), type(expected)
 		assert filenameType=="string" and expectedType=="string", msgs.checkMissingArgs\format filenameType, expectedType
 
-		result = DM.getFileSHA1 filename
+		result = ffi.string DM.getFileSHA1 filename
 		if nil == result
 			return nil, "Could not open file #{filename}."
 		if result == expected\lower!
@@ -224,7 +224,7 @@ class DownloadManager
 		stringType, expectedType = type(string), type(expected)
 		assert stringType=="string" and expectedType=="string", msgs.checkMissingArgs\format stringType, expectedType
 
-		result = DM.getStringSHA1 string
+		result = ffi.string DM.getStringSHA1 string
 		if result == expected\lower!
 			return true
 		else
