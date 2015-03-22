@@ -209,6 +209,9 @@ class DownloadManager
 	-- just make them instance methods than trying to juggle the DM init.
 	-- Also make them fat arrow functions for calling consistency.
 	checkFileSHA1: ( filename, expected ) =>
+		filenameType, expectedType = type(filename), type(expected)
+		assert filenameType=="string" and expectedType=="string", msgs.checkMissingArgs\format filenameType, expectedType
+
 		result = DM.getFileSHA1 filename
 		if nil == result
 			return nil, "Could not open file #{filename}."
@@ -218,6 +221,9 @@ class DownloadManager
 			return false, "Hash mismatch. Got #{result}, expected #{expected}."
 
 	checkStringSHA1: ( string, expected ) =>
+		stringType, expectedType = type(string), type(expected)
+		assert stringType=="string" and expectedType=="string", msgs.checkMissingArgs\format stringType, expectedType
+
 		result = DM.getStringSHA1 string
 		if result == expected\lower!
 			return true
