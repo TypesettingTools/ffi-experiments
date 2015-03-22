@@ -90,7 +90,8 @@ class DownloadManager
 
 	msgs = {
 		notInitialized: "#{@__name} not initialized.",
-		addMissingArgs: "Arguments #1 (url) and #2 (outfile) must not be nil, got url=%s, outfile=%s.",
+		addMissingArgs: "Required arguments #1 (url) or #2 (outfile) had the wrong type. Expected string, got '%s' and '%s'.",
+		checkMissingArgs: "Required arguments #1 (filename/string) and #2 (expected) or the wrong type. Expected string, got '%s' and '%s'.",
 		outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
 		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s."
 	}
@@ -130,8 +131,8 @@ class DownloadManager
 	addDownload: ( url, outfile, sha1 ) =>
 		return nil, msgs.notInitialized unless DM
 
-		unless url and outfile
-			return nil, msgs.addMissingArgs\format tostring(url), tostring(outfile)
+		urlType, outfileType = type(url), type(outfile)
+		assert urlType=="string" and outfileType=="string", msgs.addMissingArgs\format urlType, outfileType
 
 		-- expand leading ~ ourselves.
 		if homeDir = os.getenv "HOME"
