@@ -86,8 +86,8 @@ packagePaths = ( namespace, libraryName ) ->
 	return paths
 
 class DownloadManager
-	@version = 0x000107
-	@version_string = "0.1.7"
+	@version = 0x000200
+	@version_string = "0.2.0"
 
 	DM = nil
 	DMVersion = 0x000103
