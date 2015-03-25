@@ -33,7 +33,7 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, char **theEtag ) {
 	url     = theUrl;
 	outfile = theOutfile;
-	if (*theEtag != NULL)
+	if (theEtag != NULL)
 		etag  = theEtag;
 
 	thread = std::thread( &Downloader::process, this );
@@ -42,7 +42,7 @@ Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile
 Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1, char **theEtag ) {
 	url     = theUrl;
 	outfile = theOutfile;
-	if (*theEtag != NULL)
+	if (theEtag != NULL)
 		etag  = theEtag;
 
 	hasSHA1 = true;
