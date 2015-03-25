@@ -207,11 +207,16 @@ class DownloadManager
 
 		@failedCount = 0
 		for i = 1, @downloadCount
+			download = @downloads[i]
+			if download.etag
+				download.newEtag = ffi.string download.cEtag[0]
+				download.cEtag = nil
+
 			err = DM.getError @manager, i
-			if nil != err
-				@failedCount +=1
-				@failedDownloads[@failedCount] = @downloads[i]
-				@downloads[i].error = ffi.string err
+			if err != nil
+				@failedCount += 1
+				@failedDownloads[@failedCount] = download
+				download.error = ffi.string err
 
 	-- These could be class methods rather than instance methods, but
 	-- since DM has to be initialized for them to work, it's easier to
