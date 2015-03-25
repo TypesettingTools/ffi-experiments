@@ -167,8 +167,12 @@ class DownloadManager
 		-- make sure sha1 is lowercase for comparison.
 		if sha1
 			sha1 = sha1\lower!
-		cEtag = ffi.new "char*[1]"
-		cEtag[0] = strdup etag
+
+		local cEtag
+		if etag
+			cEtag = ffi.new "char*[1]"
+			cEtag[0] = strdup etag
+
 		DM.addDownload @manager, url, outfile, sha1, cEtag
 		@downloadCount += 1
 		@downloads[@downloadCount] = id:@downloadCount, :url, :outfile, :sha1, :etag, :cEtag
