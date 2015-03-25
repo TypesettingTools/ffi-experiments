@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include "Downloader.hpp"
+#include "WinCompat.h"
 
 static size_t curlWriteCallback( char *buffer, size_t size, size_t nitems, void *userdata ) {
 	return static_cast<Downloader*>(userdata)->writeCallback( buffer, size*nitems );
@@ -21,11 +22,7 @@ static size_t curlHeaderCallback( char *buffer, size_t size, size_t nitems, void
 std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	char hash[41];
 	for( unsigned int offset = 0; offset < SHA1_DIGEST_SIZE; offset++ ) {
-#ifdef _WIN32
-		_snprintf_s( hash + 2*offset, 3, _TRUNCATE, "%02x", digest[offset]);
-#else
 		snprintf( hash + 2*offset, 3, "%02x", digest[offset] );
-#endif // _WIN32
 	}
 	return std::string(hash);
 }
@@ -78,7 +75,9 @@ size_t Downloader::headerCallback( const char *buffer, size_t size ) {
 		// don't leak old etag string.
 		free( *etag );
 		// cut off an extra two chars because buffer is CRLF terminated.
-		*etag = strndup( buffer + 7, size - 10 );
+		*etag = (char*)malloc( size - 9 );
+		memcpy( *etag, buffer + 7, size - 10 );
+		(*etag)[size-10] = '\0';
 	}
 	return size;
 }
