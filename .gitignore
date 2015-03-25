@@ -1,4 +1,21 @@
+# *nix build junk
 *.processed.*
 *.o
 *.dylib
 *.so
+
+# Visual Studio junk
+*.pdb
+*.dll
+*.sdf
+*.suo
+*.log
+*.obj
+*.tlog
+*.exp
+*.lib
+*.ilk
+*.idb
+*.opensdf
+*.vcxproj.filters
+*.vcxproj.user
