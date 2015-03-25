@@ -26,13 +26,13 @@ double DownloadManager::getProgress( void ) {
 	return (addedCount > 0)? progress/addedCount: 0;
 }
 
-unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile ) {
-	downloaders.push_back( new Downloader( url, outfile ) );
+unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile, char **etag ) {
+	downloaders.push_back( new Downloader( url, outfile, etag ) );
 	return ++addedCount;
 }
 
-unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile, const std::string &sha1 ) {
-	downloaders.push_back( new Downloader( url, outfile, sha1 ) );
+unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile, const std::string &sha1, char **etag ) {
+	downloaders.push_back( new Downloader( url, outfile, sha1, etag ) );
 	return ++addedCount;
 }
 

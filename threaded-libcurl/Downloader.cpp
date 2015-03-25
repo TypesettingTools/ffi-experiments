@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 
 #include "Downloader.hpp"
 
@@ -11,6 +12,10 @@ static size_t curlWriteCallback( char *buffer, size_t size, size_t nitems, void 
 
 static int curlProgressCallback( void *userdata, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow ) {
 	return static_cast<Downloader*>(userdata)->progressCallback( dltotal, dlnow );
+}
+
+static size_t curlHeaderCallback( char *buffer, size_t size, size_t nitems, void *userdata ) {
+	return static_cast<Downloader*>(userdata)->headerCallback( buffer, size*nitems );
 }
 
 std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
@@ -25,17 +30,23 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	return std::string(hash);
 }
 
-Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile ) {
+Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, char **theEtag ) {
 	url     = theUrl;
 	outfile = theOutfile;
+	if (*theEtag != NULL)
+		etag  = theEtag;
+
 	thread = std::thread( &Downloader::process, this );
 }
 
-Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1 ) {
-	hasSHA1 = true;
+Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1, char **theEtag ) {
 	url     = theUrl;
-	sha1    = theSha1;
 	outfile = theOutfile;
+	if (*theEtag != NULL)
+		etag  = theEtag;
+
+	hasSHA1 = true;
+	sha1    = theSha1;
 	SHA1_Init( &sha1ctx );
 
 	thread = std::thread( &Downloader::process, this );
@@ -59,6 +70,19 @@ size_t Downloader::writeCallback( const char *buffer, size_t size ) {
 	return size;
 }
 
+size_t Downloader::headerCallback( const char *buffer, size_t size ) {
+	if (strncmp( buffer, "HTTP/1.1 304 Not Modified", 25 ) == 0) {
+		modified = false;
+	}
+	if (strncmp( buffer, "ETag: ", 6) == 0) {
+		// don't leak old etag string.
+		free( *etag );
+		// cut off an extra two chars because buffer is CRLF terminated.
+		*etag = strndup( buffer + 7, size - 10 );
+	}
+	return size;
+}
+
 void Downloader::finalize( void ) {
 	if (terminated)
 		return;
@@ -73,25 +97,45 @@ void Downloader::finalize( void ) {
 			return;
 		}
 	}
+	if (modified) {
+		std::fstream outStream( outfile, std::ios::out | std::ios::binary );
+		if (outStream.fail( )) {
+			error = "Couldn't open output file: " + outfile;
+			failed = true;
+			return;
+		}
 
-	std::fstream outStream( outfile, std::ios::out | std::ios::binary );
-	if (outStream.fail( )) {
-		error = "Couldn't open output file: " + outfile;
-		failed = true;
-		return;
+		outStream << outBuffer;
+		outStream.close( );
 	}
-
-	outStream << outBuffer;
-	outStream.close( );
 }
 
 void Downloader::process( void ) {
 	char curlError[CURL_ERROR_SIZE];
 	CURL *curl = curl_easy_init( );
+	struct curl_slist *slist = NULL;
 	if ( NULL == curl ) {
 		error = "Could not initialize curl.";
 		failed = true;
 		goto exit;
+	}
+
+	if ( etag != NULL ) {
+		char header[256];
+		snprintf( header, 256, "If-None-Match: \"%s\"", *etag );
+		slist = curl_slist_append( slist, header );
+		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HTTPHEADER, slist )) {
+			error = "Could not set http headers.";
+			goto fail;
+		}
+		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HEADERDATA, this )) {
+			error = "Could not set progress callback.";
+			goto fail;
+		}
+		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HEADERFUNCTION, curlHeaderCallback ) ) {
+			error = "Could not set header callback.";
+			goto fail;
+		}
 	}
 
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_WRITEDATA, this )) {
@@ -154,6 +198,7 @@ void Downloader::process( void ) {
 fail:
 	failed = true;
 cleanup:
+	curl_slist_free_all( slist );
 	curl_easy_cleanup( curl );
 exit:
 	done = true;

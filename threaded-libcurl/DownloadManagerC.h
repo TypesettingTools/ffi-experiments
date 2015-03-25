@@ -17,7 +17,8 @@ typedef unsigned int uint;
 
 EXPORT CDlM*       newDM        ( void );
 EXPORT uint        addDownload  ( CDlM *mgr,           const char *url,
-                                  const char *outfile, const char *sha1 );
+                                  const char *outfile, const char *sha1,
+                                  char **etag );
 EXPORT double      progress     ( CDlM *mgr );
 EXPORT int         busy         ( CDlM *mgr );
 EXPORT int         checkDownload( CDlM *mgr, uint i );

@@ -62,9 +62,13 @@ ffi.cdef [[
 ___INCLUDE___
 int usleep(unsigned int);
 void Sleep(unsigned long);
+char *strdup(const char *);
+char *_strdup(const char *);
 ]]
 
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
+strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
+
 packagePaths = ( namespace, libraryName ) ->
 	paths = { }
 	fixedLibraryName = namespace .. "/" .. "#{(ffi.os != 'Windows') and 'lib' or ''}#{libraryName}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
@@ -128,11 +132,11 @@ class DownloadManager
 		@failedDownloads = { }
 		@failedCount     = 0
 
-	addDownload: ( url, outfile, sha1 ) =>
+	addDownload: ( url, outfile, sha1, etag ) =>
 		return nil, msgs.notInitialized unless DM
 
-		urlType, outfileType = type(url), type(outfile)
-		assert urlType=="string" and outfileType=="string", msgs.addMissingArgs\format urlType, outfileType
+		urlType, outfileType = type( url ), type outfile
+		assert urlType == "string" and outfileType == "string", msgs.addMissingArgs\format urlType, outfileType
 
 		-- expand leading ~ ourselves.
 		if homeDir = os.getenv "HOME"
@@ -163,10 +167,11 @@ class DownloadManager
 		-- make sure sha1 is lowercase for comparison.
 		if sha1
 			sha1 = sha1\lower!
-
-		DM.addDownload @manager, url, outfile, sha1
+		cEtag = ffi.new "char*[1]"
+		cEtag[0] = strdup etag
+		DM.addDownload @manager, url, outfile, sha1, cEtag
 		@downloadCount += 1
-		@downloads[@downloadCount] = id:@downloadCount, :url, :outfile, :sha1
+		@downloads[@downloadCount] = id:@downloadCount, :url, :outfile, :sha1, :etag, :cEtag
 		return @downloads[@downloadCount]
 
 	progress: =>

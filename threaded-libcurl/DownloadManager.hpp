@@ -13,8 +13,8 @@ class DownloadManager {
 		DownloadManager( void );
 		~DownloadManager( void );
 		double getProgress( void );
-		unsigned int addDownload( const std::string &url, const std::string &outfile );
-		unsigned int addDownload( const std::string &url, const std::string &outfile, const std::string &sha1 );
+		unsigned int addDownload( const std::string &url, const std::string &outfile, char **etag );
+		unsigned int addDownload( const std::string &url, const std::string &outfile, const std::string &sha1, char **etag );
 		int checkDownload( unsigned int i );
 		const char* getError( unsigned int i );
 		void terminate( void );
