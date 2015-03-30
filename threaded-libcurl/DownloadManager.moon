@@ -259,6 +259,8 @@ class DownloadManager
 			if @cacheDir and download.etag
 				etagCacheCheck download, @
 
+			if "function" == type download.callback
+				download\callback @
 
 	-- These could be class methods rather than instance methods, but
 	-- since DM has to be initialized for them to work, it's easier to
