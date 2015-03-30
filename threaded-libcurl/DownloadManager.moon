@@ -103,7 +103,7 @@ class DownloadManager
 	freeManager = ( manager ) ->
 		DM.freeDM manager
 
-	new: ( additionalPaths = { } ) =>
+	new: ( etagCacheDir, additionalPaths = { } ) =>
 		unless "table" == type additionalPaths
 			additionalPaths = { tostring additionalPaths }
 
@@ -131,29 +131,27 @@ class DownloadManager
 		@downloadCount   = 0
 		@failedDownloads = { }
 		@failedCount     = 0
+		result, message  = etagCacheDir and sanitizeFile( etagCacheDir\gsub "[/\\]*$", "/", 1 ) or nil
+		assert not message, message
+		@cacheDir        = result
 
-	addDownload: ( url, outfile, sha1, etag ) =>
-		return nil, msgs.notInitialized unless DM
-
-		urlType, outfileType = type( url ), type outfile
-		assert urlType == "string" and outfileType == "string", msgs.addMissingArgs\format urlType, outfileType
-
-		-- expand leading ~ ourselves.
+	sanitizeFile = ( filename ) =>
+		-- expand leading ~.
 		if homeDir = os.getenv "HOME"
-			outfile = outfile\gsub "^~", homeDir .. "/"
+			filename = filename\gsub "^~/", homeDir .. "/"
 
-		dev, dir, file = outfile\match "^(#{ffi.os=='Windows' and '%a:[\\/]' or '/'})(.*)[/\\](.*)$"
+		dev, dir, file = filename\match "^(#{ffi.os == 'Windows' and '%a:[/\\]' or '/'})(.*[/\\])(.*)$"
 
-		-- check that outfile is a full path as we don't support relative
+		-- check that filename is a full path as we don't support relative
 		-- ones or automatic file naming
 		if not dev or #dir < 1
-			return nil, msgs.outNoFullPath\format outfile
+			return nil, msgs.outNoFullPath\format filename
 		elseif #file < 1
-			return nil, msgs.outNoFile\format outfile
+			return nil, msgs.outNoFile\format filename
 
+		dir = dev .. dir
 		if havelfs
 			-- check that directory exists, but only if we have lfs.
-			dir = dev .. dir
 			mode, err = lfs.attributes dir, "mode"
 			if mode != "directory"
 				-- lfs.attributes returns nil and no error if the folder wasn't
@@ -163,6 +161,38 @@ class DownloadManager
 				res, err = lfs.mkdir dir
 				-- lfs.mkdir returns nil on success and error alike
 				return nil, err if err
+
+		else
+			-- probably should care about the return code
+			os.execute "mkdir #{ffi.os == 'Windows' and '' or '-p '}\"#{dir}\""
+
+		return dir .. file
+
+	getCachedFile = ( etag ) =>
+		return @cacheDir .. etag
+
+	etagCacheCheck = ( manager ) =>
+		return if (not @newEtag) or @failed or (not manager.cacheDir)
+		source = getCachedFile manager, @newEtag
+		-- if the newEtag matches the provided etag then nothing was
+		-- actually downloaded, so we need to copy the cached file to the
+		-- expected output.
+		if @newEtag == @etag
+			-- should probably check if source exists.
+			os.execute "cp \"#{source}\" \"#{@outfile}\""
+
+		-- otherwise, the file was downloaded and we need to copy it into
+		-- our etag cache directory.
+		else
+			os.execute "cp \"#{@outfile}\" \"#{source}\""
+
+	addDownload: ( url, outfile, sha1, etag ) =>
+		return nil, msgs.notInitialized unless DM
+
+		urlType, outfileType = type( url ), type outfile
+		assert urlType == "string" and outfileType == "string", msgs.addMissingArgs\format urlType, outfileType
+
+		outfile = sanitizeFile outfile
 
 		-- make sure sha1 is lowercase for comparison.
 		if sha1
@@ -217,6 +247,11 @@ class DownloadManager
 				@failedCount += 1
 				@failedDownloads[@failedCount] = download
 				download.error = ffi.string err
+				download.failed = true
+
+			if @cacheDir and download.etag
+				etagCacheCheck download, @
+
 
 	-- These could be class methods rather than instance methods, but
 	-- since DM has to be initialized for them to work, it's easier to
