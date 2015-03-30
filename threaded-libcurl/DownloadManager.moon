@@ -189,19 +189,25 @@ class DownloadManager
 	addDownload: ( url, outfile, sha1, etag ) =>
 		return nil, msgs.notInitialized unless DM
 
+		-- sha1 and etag types get (lazy) checked later.
 		urlType, outfileType = type( url ), type outfile
 		assert urlType == "string" and outfileType == "string", msgs.addMissingArgs\format urlType, outfileType
 
 		outfile = sanitizeFile outfile
 
 		-- make sure sha1 is lowercase for comparison.
-		if sha1
+		if "string" == type sha1
 			sha1 = sha1\lower!
+		else
+			sha1 = nil
 
 		local cEtag
 		if etag
 			cEtag = ffi.new "char*[1]"
-			cEtag[0] = strdup etag
+			if "string" == type etag
+				cEtag[0] = strdup etag
+			else
+				cEtag[0] = strdup ""
 
 		DM.addDownload @manager, url, outfile, sha1, cEtag
 		@downloadCount += 1
@@ -239,7 +245,8 @@ class DownloadManager
 		for i = 1, @downloadCount
 			download = @downloads[i]
 			if download.etag
-				download.newEtag = ffi.string download.cEtag[0]
+				if download.cEtag != nil
+					download.newEtag = ffi.string download.cEtag[0]
 				download.cEtag = nil
 
 			err = DM.getError @manager, i
