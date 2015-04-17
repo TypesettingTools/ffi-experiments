@@ -220,7 +220,7 @@ class DownloadManager
 
 		DM.addDownload @manager, url, outfile, sha1, cEtag
 		@downloadCount += 1
-		@downloads[@downloadCount] = id:@downloadCount, :url, :outfile, :sha1, :etag, :cEtag
+		@downloads[@downloadCount] = { id: @downloadCount, :url, :outfile, :sha1, :etag, :cEtag }
 		return @downloads[@downloadCount]
 
 	progress: =>
@@ -253,10 +253,11 @@ class DownloadManager
 		@failedCount = 0
 		for i = 1, @downloadCount
 			download = @downloads[i]
-			if download.cEtag[0] != nil
-				download.newEtag = ffi.string download.cEtag[0]
-			-- I think this actually leaks the string at cEtag[0].
-			download.cEtag = nil
+			if download.cEtag != nil
+				if download.cEtag[0] != nil
+					download.newEtag = ffi.string download.cEtag[0]
+				-- I think this actually leaks the string at cEtag[0].
+				download.cEtag = nil
 
 			err = DM.getError @manager, i
 			if err != nil
