@@ -131,11 +131,12 @@ class DownloadManager
 		@downloadCount   = 0
 		@failedDownloads = { }
 		@failedCount     = 0
-		result, message  = etagCacheDir and sanitizeFile( etagCacheDir\gsub "[/\\]*$", "/", 1 ) or nil
-		assert not message, message
-		@cacheDir        = result
+		if etagCacheDir
+			result, message  = sanitizeFile etagCacheDir\gsub( "[/\\]*$", "/", 1 ), true
+			assert message == nil, message
+			@cacheDir        = result
 
-	sanitizeFile = ( filename ) =>
+	sanitizeFile = ( filename, acceptDir ) ->
 		-- expand leading ~.
 		if homeDir = os.getenv "HOME"
 			filename = filename\gsub "^~/", homeDir .. "/"
@@ -146,7 +147,7 @@ class DownloadManager
 		-- ones or automatic file naming
 		if not dev or #dir < 1
 			return nil, msgs.outNoFullPath\format filename
-		elseif #file < 1
+		elseif not acceptDir and #file < 1
 			return nil, msgs.outNoFile\format filename
 
 		dir = dev .. dir
@@ -171,6 +172,17 @@ class DownloadManager
 	getCachedFile = ( etag ) =>
 		return @cacheDir .. etag
 
+	copyFile = ( source, target ) ->
+		-- actually handling errors is for big chumps.
+		input,  msg = io.open source, 'rb'
+		assert input, msg
+		output, msg = io.open target, 'wb'
+		assert output, msg
+		err,    msg = output\write input\read '*a'
+		assert err, msg
+		input\close!
+		output\close!
+
 	etagCacheCheck = ( manager ) =>
 		return if (not @newEtag) or @failed or (not manager.cacheDir)
 		source = getCachedFile manager, @newEtag
@@ -179,12 +191,12 @@ class DownloadManager
 		-- expected output.
 		if @newEtag == @etag
 			-- should probably check if source exists.
-			os.execute "cp \"#{source}\" \"#{@outfile}\""
+			copyFile source, @outfile
 
 		-- otherwise, the file was downloaded and we need to copy it into
 		-- our etag cache directory.
 		else
-			os.execute "cp \"#{@outfile}\" \"#{source}\""
+			copyFile @outfile, source
 
 	addDownload: ( url, outfile, sha1, etag ) =>
 		return nil, msgs.notInitialized unless DM
@@ -256,7 +268,7 @@ class DownloadManager
 				download.error = ffi.string err
 				download.failed = true
 
-			if @cacheDir and download.etag
+			if @cacheDir and download.etag and not download.failed
 				etagCacheCheck download, @
 
 			if "function" == type download.callback
