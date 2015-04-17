@@ -184,7 +184,6 @@ class DownloadManager
 		output\close!
 
 	etagCacheCheck = ( manager ) =>
-		return if (not @newEtag) or @failed or (not manager.cacheDir)
 		source = getCachedFile manager, @newEtag
 		-- if the newEtag matches the provided etag then nothing was
 		-- actually downloaded, so we need to copy the cached file to the
@@ -213,13 +212,11 @@ class DownloadManager
 		else
 			sha1 = nil
 
-		local cEtag
-		if etag
-			cEtag = ffi.new "char*[1]"
-			if "string" == type etag
-				cEtag[0] = strdup etag
-			else
-				cEtag[0] = strdup ""
+		cEtag = ffi.new "char*[1]"
+		if "string" == type etag
+			cEtag[0] = strdup etag
+		else
+			cEtag[0] = strdup ""
 
 		DM.addDownload @manager, url, outfile, sha1, cEtag
 		@downloadCount += 1
@@ -256,10 +253,10 @@ class DownloadManager
 		@failedCount = 0
 		for i = 1, @downloadCount
 			download = @downloads[i]
-			if download.etag
-				if download.cEtag != nil
-					download.newEtag = ffi.string download.cEtag[0]
-				download.cEtag = nil
+			if download.cEtag[0] != nil
+				download.newEtag = ffi.string download.cEtag[0]
+			-- I think this actually leaks the string at cEtag[0].
+			download.cEtag = nil
 
 			err = DM.getError @manager, i
 			if err != nil
@@ -268,7 +265,7 @@ class DownloadManager
 				download.error = ffi.string err
 				download.failed = true
 
-			if @cacheDir and download.etag and not download.failed
+			if @cacheDir and download.newEtag and not download.failed
 				etagCacheCheck download, @
 
 			if "function" == type download.callback
