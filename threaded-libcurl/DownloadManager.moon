@@ -90,7 +90,7 @@ class DownloadManager
 	@version_string = "0.2.0"
 
 	DM = nil
-	DMVersion = 0x000103
+	DMVersion = 0x000200
 
 	msgs = {
 		notInitialized: "#{@__name} not initialized.",
