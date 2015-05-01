@@ -16,6 +16,16 @@ if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/655
 class PreciseTimer
 	@version = 0x000104
 	@version_string = "0.1.4"
+	@attachDepctrl = (DependencyControl) ->
+		@version = DependencyControl {
+			name: "#{@__name}",
+			version: @version_string,
+			description: "Measure times down to the nanosecond. Except not really.",
+			author: "torque",
+			url: "https://github.com/torque/ffi-experiments",
+			moduleName: "PT.#{@__name}",
+			feed: "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
+		}
 	:loadedLibraryPath
 
 	freeTimer = ( timer ) ->

@@ -52,5 +52,19 @@ requireffi = ( name ) =>
 
 	return tryLoad name, packagePaths namespace, libraryName
 
-return setmetatable { :version }, { __call: requireffi }
+local versionRecord
+versionRecord = {
+	:version,
+	attachDepctrl: (DependencyControl) ->
+		versionRecord.version = DependencyControl {
+			name: "requireffi",
+			version: version,
+			description: "FFI.load wrapper for loading C modules.",
+			author: "torque",
+			url: "https://github.com/torque/ffi-experiments",
+			moduleName: "requireffi.requireffi",
+			feed: "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
+		}
+}
+return setmetatable versionRecord, { __call: requireffi }
 
