@@ -30,7 +30,7 @@ for path in *libraryPaths
 		loadedLibraryPath = path
 		break
 	else
-		table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
+		table.insert messages, "Error loading %q: %s"\format path, BM\gsub "[\n\t\r]", " "
 
 assert success, table.concat messages, "\n"
 
