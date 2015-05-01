@@ -52,12 +52,15 @@
 Error Handling:
 	Errors are handled in typical Lua fashion.
 	DownloadManager will only throw an error in case the library failed to load.
-	If any other error is encoutered the script will return nil along with an error message.
+	Errors will also be thrown if the wrong type is passed in to certain functions to avoid
+	missing incorrect usage.
+	If any other error is encountered the script will return nil along with an error message.
 
 ]]
 
 havelfs, lfs = pcall require, "lfs"
 ffi = require "ffi"
+requireffi = require "requireffi"
 ffi.cdef [[
 ___INCLUDE___
 int usleep(unsigned int);
@@ -66,31 +69,19 @@ char *strdup(const char *);
 char *_strdup(const char *);
 ]]
 
+DMVersion = 0x000200
+DM, loadedLibraryPath = requireffi "DM.DownloadManager"
+libVer = DM.version!
+if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
+	error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
+
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
 
-packagePaths = ( namespace, libraryName ) ->
-	paths = { }
-	fixedLibraryName = namespace .. "/" .. "#{(ffi.os != 'Windows') and 'lib' or ''}#{libraryName}.#{(OSX: 'dylib', Windows: 'dll')[ffi.os] or 'so'}"
-	package.path\gsub "([^;]+)", ( path ) ->
-		-- the init.lua paths are just dupes of other paths.
-		if path\match "/%?/init%.lua$"
-			return
-
-		path = path\gsub "//?%?%.lua$", "/"
-		table.insert paths, path .. fixedLibraryName
-
-	-- Add the untouched library name so that ffi will search system
-	-- library paths too.
-	table.insert paths, libraryName
-	return paths
-
 class DownloadManager
-	@version = 0x000200
-	@version_string = "0.2.0"
-
-	DM = nil
-	DMVersion = 0x000200
+	@version = 0x000201
+	@version_string = "0.2.1"
+	:loadedLibraryPath
 
 	msgs = {
 		notInitialized: "#{@__name} not initialized.",
@@ -103,31 +94,7 @@ class DownloadManager
 	freeManager = ( manager ) ->
 		DM.freeDM manager
 
-	new: ( etagCacheDir, additionalPaths = { } ) =>
-		unless "table" == type additionalPaths
-			additionalPaths = { tostring additionalPaths }
-
-		libraryPaths = packagePaths "DM", @@__name
-		for path in *additionalPaths
-			table.insert libraryPaths, path
-
-		unless DM
-			success = false
-			messages = { "Could not load #{@@__name} C library." }
-			for path in *libraryPaths
-				success, DM = pcall ffi.load, path
-				if success
-					@loadedLibraryPath = path
-					break
-				else
-					table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
-
-			assert success, table.concat messages, "\n"
-
-			libVer = DM.version!
-			if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
-				error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
-
+	new: ( etagCacheDir ) =>
 		@manager = ffi.gc DM.newDM!, freeManager
 		@downloads       = { }
 		@downloadCount   = 0
