@@ -13,3 +13,7 @@ Measure times down to the nanosecond. Except not really.
 #### DownloadManager
 
 Download things with libcurl without blocking Lua.
+
+#### requireffi
+
+Load C libraries using `package.path`.
