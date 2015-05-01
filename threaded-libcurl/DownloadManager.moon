@@ -81,6 +81,16 @@ strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
 class DownloadManager
 	@version = 0x000201
 	@version_string = "0.2.1"
+	@attachDepctrl = (DependencyControl) ->
+		@version = DependencyControl{
+		    name: "#{@__name}",
+		    version: @version_string,
+		    description: "Download things with libcurl without blocking Lua.",
+		    author: "torque",
+		    url: "https://github.com/torque/ffi-experiments",
+		    moduleName: "DM.#{@__name}",
+		    feed: "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
+		}
 	:loadedLibraryPath
 
 	msgs = {
