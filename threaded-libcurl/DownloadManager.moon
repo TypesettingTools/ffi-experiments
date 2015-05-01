@@ -271,7 +271,10 @@ class DownloadManager
 				download.failed = true
 
 			if @cacheDir and download.newEtag and not download.failed
-				etagCacheCheck download, @
+				err, msg = pcall etagCacheCheck, download, @
+				if not err
+					download.error = "Etag cache check failed with message: " .. msg
+					download.failed = true
 
 			if "function" == type download.callback
 				download\callback @
