@@ -122,12 +122,11 @@ class DownloadManager
 				else
 					table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
 
-			if success
-				libVer = DM.version!
-				if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
-					error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
-
 			assert success, table.concat messages, "\n"
+
+			libVer = DM.version!
+			if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
+				error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
 
 		@manager = ffi.gc DM.newDM!, freeManager
 		@downloads       = { }

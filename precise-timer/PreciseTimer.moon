@@ -50,12 +50,11 @@ class PreciseTimer
 				else
 					table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
 
-			if success
-				libVer = PT.version!
-				if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/65536%256)
-					error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
-
 			assert success, assert success, table.concat messages, "\n"
+
+			libVer = PT.version!
+			if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/65536%256)
+				error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
 
 		@timer = ffi.gc PT.startTimer!, freeTimer
 
