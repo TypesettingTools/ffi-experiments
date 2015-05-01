@@ -40,19 +40,22 @@ class PreciseTimer
 			table.insert libraryPaths, path
 
 		unless PT
+			messages = { "Could not load #{@@__name} C library." }
 			success = false
 			for path in *libraryPaths
 				success, PT = pcall ffi.load, path
 				if success
 					@loadedLibraryPath = path
 					break
+				else
+					table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
 
 			if success
 				libVer = PT.version!
 				if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/65536%256)
 					error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
 
-			assert success, "Could not load #{@@__name} C library."
+			assert success, assert success, table.concat messages, "\n"
 
 		@timer = ffi.gc PT.startTimer!, freeTimer
 

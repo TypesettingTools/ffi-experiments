@@ -113,18 +113,21 @@ class DownloadManager
 
 		unless DM
 			success = false
+			messages = { "Could not load #{@@__name} C library." }
 			for path in *libraryPaths
 				success, DM = pcall ffi.load, path
 				if success
 					@loadedLibraryPath = path
 					break
+				else
+					table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
 
 			if success
 				libVer = DM.version!
 				if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
 					error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
 
-			assert success, "Could not load #{@@__name} C library."
+			assert success, table.concat messages, "\n"
 
 		@manager = ffi.gc DM.newDM!, freeManager
 		@downloads       = { }

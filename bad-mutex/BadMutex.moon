@@ -22,14 +22,17 @@ packagePaths = ( namespace, libraryName ) ->
 
 libraryPaths = packagePaths "BM", __name
 
+messages = { "Could not load #{__name} C library." }
 success = false
 for path in *libraryPaths
 	success, BM = pcall ffi.load, path
 	if success
 		loadedLibraryPath = path
 		break
+	else
+		table.insert messages, "Error loading %q: %s"\format path, DM\gsub "[\n\t\r]", " "
 
-assert success, "Could not load #{__name} C library."
+assert success, table.concat messages, "\n"
 
 BMVersion = 0x000100
 libVer = BM.version!
