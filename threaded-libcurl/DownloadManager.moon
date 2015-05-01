@@ -206,7 +206,9 @@ class DownloadManager
 		urlType, outfileType = type( url ), type outfile
 		assert urlType == "string" and outfileType == "string", msgs.addMissingArgs\format urlType, outfileType
 
-		outfile = sanitizeFile outfile
+		outfile, msg = sanitizeFile outfile
+		if outfile == nil
+			return outfile, msg
 
 		-- make sure sha1 is lowercase for comparison.
 		if "string" == type sha1
