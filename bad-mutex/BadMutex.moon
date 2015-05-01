@@ -1,5 +1,5 @@
 ffi = require "ffi"
-requireffi = require "requireffi"
+requireffi = require "requireffi.requireffi"
 ffi.cdef [[
 ___INCLUDE___
 ]]

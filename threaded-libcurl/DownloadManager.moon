@@ -60,7 +60,7 @@ Error Handling:
 
 havelfs, lfs = pcall require, "lfs"
 ffi = require "ffi"
-requireffi = require "requireffi"
+requireffi = require "requireffi.requireffi"
 ffi.cdef [[
 ___INCLUDE___
 int usleep(unsigned int);
