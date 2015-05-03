@@ -25,25 +25,25 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "E2D95BB2DA5FDD7021FC92EF8DD19275C9708E4B"
+							"sha1": "##__BADMUTEX_LUA_HASH__##"
 						},
 						{
 							"name": "/BadMutex.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win32.dll",
 							"platform": "Windows-x86",
-							"sha1": "1FDA8C0F5D848120DC269FFE4081C873E8B8085C"
+							"sha1": "##__BADMUTEX_DLL_32_HASH__##"
 						},
 						{
 							"name": "/BadMutex.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win64.dll",
 							"platform": "Windows-x64",
-							"sha1": "00D3A65927D9A2F6B960B549D60BF12ED75F0A9F"
+							"sha1": "##__BADMUTEX_DLL_64_HASH__##"
 						},
 						{
 							"name": "/libBadMutex.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "69395784546C9A1767A660AF3382D48747FDFDA5"
+							"sha1": "##__BADMUTEX_DYLIB_64_HASH__##"
 						}
 					],
 					"requiredModules": [
@@ -75,25 +75,25 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "ADA5F7BC310CA4BADDEDCA387402521AF99E67C4"
+							"sha1": "##__PRECISETIMER_LUA_HASH__##"
 						},
 						{
 							"name": "/PreciseTimer.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win32.dll",
 							"platform": "Windows-x86",
-							"sha1": "87E540F679D1A43954E4F436CD514FC7AF5BD682"
+							"sha1": "##__PRECISETIMER_DLL_32_HASH__##"
 						},
 						{
 							"name": "/PreciseTimer.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win64.dll",
 							"platform": "Windows-x64",
-							"sha1": "5E9182EF279C7C40B549769D029861DFCF8720C3"
+							"sha1": "##__PRECISETIMER_DLL_64_HASH__##"
 						},
 						{
 							"name": "/libPreciseTimer.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "9E8CCA0406003883C025A5AD156625D6EEFD0171"
+							"sha1": "##__PRECISETIMER_DYLIB_64_HASH__##"
 						}
 					],
 					"requiredModules": [
@@ -125,25 +125,25 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "23D905C36A15F8B89C80EAA3C60133881FC846C1"
+							"sha1": "##__DOWNLOADMANAGER_LUA_HASH__##"
 						},
 						{
 							"name": "/DownloadManager.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win32.dll",
 							"platform": "Windows-x86",
-							"sha1": "01F1866FEF1C84BE2041880AEEC0505F5FB78EA5"
+							"sha1": "##__DOWNLOADMANAGER_DLL_32_HASH__##"
 						},
 						{
 							"name": "/DownloadManager.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win64.dll",
 							"platform": "Windows-x64",
-							"sha1": "8F82F84237769119EE0CCA0481DA77715C37AEA3"
+							"sha1": "##__DOWNLOADMANAGER_DLL_64_HASH__##"
 						},
 						{
 							"name": "/libDownloadManager.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "D63ABB54DEF7A41152F621704F0A1FE527C26FE6"
+							"sha1": "##__DOWNLOADMANAGER_DYLIB_64_HASH__##"
 						}
 					],
 					"requiredModules": [
@@ -174,7 +174,7 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "FF2A6BDF8370E774C90360BA421983157542C21D"
+							"sha1": "##__REQUIREFFI_LUA_HASH__##"
 						}
 					],
 					"requiredModules": [
