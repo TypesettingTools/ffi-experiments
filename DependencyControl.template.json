@@ -116,7 +116,7 @@
 			"description": "Nonblocking downloads with libcurl.",
 			"channels": {
 				"release": {
-					"version": "0.2.1",
+					"version": "0.3.0",
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
