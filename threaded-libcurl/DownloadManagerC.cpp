@@ -64,6 +64,10 @@ extern "C" {
 	EXPORT void freeDM( CDlM* mgr ) {
 		delete reinterpret_cast<DownloadManager*>(mgr);
 	}
+
+	EXPORT bool isInternetConnected() {
+		return DownloadManager::isInternetConnected();
+	}
 }
 
 /*

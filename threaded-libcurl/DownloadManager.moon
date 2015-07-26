@@ -284,3 +284,6 @@ class DownloadManager
 			return true
 		else
 			return false, "Hash mismatch. Got #{result}, expected #{expected}."
+
+	isInternetConnected: =>
+		return DM.isInternetConnected!
