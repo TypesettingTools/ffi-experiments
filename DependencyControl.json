@@ -43,7 +43,7 @@
 							"name": "/libBadMutex.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "69395784546C9A1767A660AF3382D48747FDFDA5"
+							"sha1": "5254E63B9D3DD0DCE354A26581470A5DEB9A84D0"
 						}
 					],
 					"requiredModules": [
@@ -116,7 +116,7 @@
 			"description": "Nonblocking downloads with libcurl.",
 			"channels": {
 				"release": {
-					"version": "0.2.1",
+					"version": "0.3.0",
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
@@ -125,25 +125,25 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "23D905C36A15F8B89C80EAA3C60133881FC846C1"
+							"sha1": "DF9278018B513821F428BE8AD04C8B4C0888BBA8"
 						},
 						{
 							"name": "/DownloadManager.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win32.dll",
 							"platform": "Windows-x86",
-							"sha1": "01F1866FEF1C84BE2041880AEEC0505F5FB78EA5"
+							"sha1": "0F77B5CACC5281558AD6CBF51763B17862CD984C"
 						},
 						{
 							"name": "/DownloadManager.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win64.dll",
 							"platform": "Windows-x64",
-							"sha1": "8F82F84237769119EE0CCA0481DA77715C37AEA3"
+							"sha1": "E9CE4D1901A66241E3F8D20098258DB4F340DEF0"
 						},
 						{
 							"name": "/libDownloadManager.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "D63ABB54DEF7A41152F621704F0A1FE527C26FE6"
+							"sha1": "29634BF7CD33AB8154E30FB24621211908E7D53F"
 						}
 					],
 					"requiredModules": [
