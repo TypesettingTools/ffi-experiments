@@ -173,6 +173,10 @@ void Downloader::process( void ) {
 		error = "Could not set error buffer.";
 		goto fail;
 	}
+	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_ACCEPT_ENCODING, "" )) {
+		error = "Could not set Accept-Encoding header.";
+		goto fail;
+	}
 
 	switch (curl_easy_perform( curl )) {
 	case CURLE_OK:
