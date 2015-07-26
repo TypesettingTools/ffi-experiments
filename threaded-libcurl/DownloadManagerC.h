@@ -9,6 +9,8 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#include <stdbool.h>
 #endif
 
 struct CDlM;
@@ -29,7 +31,7 @@ EXPORT const char* getFileSHA1  ( const char *filename );
 EXPORT const char* getStringSHA1( const char *string );
 EXPORT uint        version      ( void );
 EXPORT void        freeDM       ( CDlM *mgr );
-EXPORT bool        isInternetConnected();
+EXPORT bool        isInternetConnected( void );
 #ifdef __cplusplus
 }
 #endif

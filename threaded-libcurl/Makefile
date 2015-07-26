@@ -1,11 +1,6 @@
 CC  := clang
 CXX := clang++
 UNAME := $(shell uname -s)
-ifeq ($(UNAME),Darwin)
-	LIB_EXT :=.dylib
-else
-	LIB_EXT :=.so
-endif
 
 WARNINGS := -Wall -Wunreachable-code -Wfloat-equal -Wredundant-decls -Winit-self -Wpedantic
 OPTIMIZATION := -O3 -ggdb
@@ -15,6 +10,13 @@ LDFLAGS := -lcurl -lc++ -ggdb -shared -fPIC
 CPPSOURCES := $(wildcard *.cpp)
 CSOURCES   := $(wildcard *.c)
 OBJECTS := $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o)
+
+ifeq ($(UNAME),Darwin)
+	LIB_EXT :=.dylib
+	LDFLAGS += -framework CoreFoundation -framework SystemConfiguration
+else
+	LIB_EXT :=.so
+endif
 
 OUTPUT := libDownloadManager$(LIB_EXT)
 

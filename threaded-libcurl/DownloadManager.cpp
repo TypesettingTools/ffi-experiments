@@ -6,8 +6,14 @@
 #include <curl/curl.h>
 #include "DownloadManager.hpp"
 #include "sha1.h"
-#ifdef _WIN32
+
+#if defined(_WIN32)
 #include <wininet.h>
+
+#elif defined(__APPLE__)
+#include <netinet/in.h>
+#include <SystemConfiguration/SystemConfiguration.h>
+
 #endif
 
 DownloadManager::DownloadManager( void ) {
@@ -114,12 +120,30 @@ std::string DownloadManager::getStringSHA1( const std::string &string ) {
 	return digestToHex( digest );
 }
 
-#ifdef _WIN32
 bool DownloadManager::isInternetConnected() {
+#if defined(_WIN32)
 	DWORD flags = 0; // don't care about those
-	return !!InternetGetConnectedState(&flags, 0);
-}
+	return !!InternetGetConnectedState( &flags, 0 );
+
+#elif defined(__APPLE__)
+	struct sockaddr address = {};
+	address.sa_len = sizeof(address);
+	address.sa_family = AF_INET;
+
+	SCNetworkConnectionFlags flags = 0;
+	SCNetworkReachabilityRef target = SCNetworkReachabilityCreateWithAddress( kCFAllocatorDefault, &address );
+	if ( target == NULL )
+		return false;
+
+	bool flagsValid = SCNetworkReachabilityGetFlags( target, &flags );
+	CFRelease(target);
+	return flagsValid && (flags & kSCNetworkReachabilityFlagsReachable) && !(flags & kSCNetworkReachabilityFlagsConnectionRequired);
+
+#else // todo: add linux code?
+	return true;
+
 #endif
+}
 
 /*
 #include <unistd.h> // usleep
