@@ -6,6 +6,9 @@
 #include <curl/curl.h>
 #include "DownloadManager.hpp"
 #include "sha1.h"
+#ifdef _WIN32
+#include <wininet.h>
+#endif
 
 DownloadManager::DownloadManager( void ) {
 	curl_global_init( CURL_GLOBAL_ALL );
@@ -110,6 +113,13 @@ std::string DownloadManager::getStringSHA1( const std::string &string ) {
 	SHA1_Final( &ctx, digest );
 	return digestToHex( digest );
 }
+
+#ifdef _WIN32
+bool DownloadManager::isInternetConnected() {
+	DWORD flags = 0; // don't care about those
+	return !!InternetGetConnectedState(&flags, 0);
+}
+#endif
 
 /*
 #include <unistd.h> // usleep

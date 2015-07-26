@@ -22,4 +22,5 @@ class DownloadManager {
 		int busy( void );
 		static std::string getFileSHA1( const std::string &filename );
 		static std::string getStringSHA1( const std::string &string );
+		static bool isInternetConnected();
 };

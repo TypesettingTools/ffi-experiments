@@ -29,7 +29,7 @@ EXPORT const char* getFileSHA1  ( const char *filename );
 EXPORT const char* getStringSHA1( const char *string );
 EXPORT uint        version      ( void );
 EXPORT void        freeDM       ( CDlM *mgr );
-
+EXPORT bool        isInternetConnected();
 #ifdef __cplusplus
 }
 #endif
