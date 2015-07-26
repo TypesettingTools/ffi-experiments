@@ -6,7 +6,7 @@
 	"url": "@{baseUrl}",
 	"maintainer": "torque",
 	"knownFeeds": {
-		"this": "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
+		"this": "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json"
 	},
 	"modules": {
 		"BM.BadMutex": {
@@ -16,7 +16,7 @@
 			"description": "A bad, global mutex.",
 			"channels": {
 				"release": {
-					"version": "0.1.2",
+					"version": "0.1.3",
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
@@ -25,7 +25,11 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "E2D95BB2DA5FDD7021FC92EF8DD19275C9708E4B"
+							"sha1": "5654B9E7F89DDD3CFBBA2310A1B8F4CDB8CA571A"
+						},
+						{
+							"name": ".dll",
+							"delete": true
 						},
 						{
 							"name": "/BadMutex.dll",
@@ -43,7 +47,7 @@
 							"name": "/libBadMutex.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "5254E63B9D3DD0DCE354A26581470A5DEB9A84D0"
+							"sha1": "3BD86DC82991C0002ED8C13972D27D247A1BA38B"
 						}
 					],
 					"requiredModules": [
@@ -66,7 +70,7 @@
 			"description": "A precise timer.",
 			"channels": {
 				"release": {
-					"version": "0.1.4",
+					"version": "0.1.5",
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
@@ -75,7 +79,11 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "ADA5F7BC310CA4BADDEDCA387402521AF99E67C4"
+							"sha1": "9016C1CFBBAC91950E43A76670B106184806EB26"
+						},
+						{
+							"name": ".dll",
+							"delete": true
 						},
 						{
 							"name": "/PreciseTimer.dll",
@@ -116,7 +124,7 @@
 			"description": "Nonblocking downloads with libcurl.",
 			"channels": {
 				"release": {
-					"version": "0.3.0",
+					"version": "0.3.1",
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
@@ -125,7 +133,11 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "DF9278018B513821F428BE8AD04C8B4C0888BBA8"
+							"sha1": "6F295C9E533B34015B3DFADFA5B8835DA3E9311D"
+						},
+						{
+							"name": ".dll",
+							"delete": true
 						},
 						{
 							"name": "/DownloadManager.dll",
@@ -143,7 +155,7 @@
 							"name": "/libDownloadManager.dylib",
 							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "29634BF7CD33AB8154E30FB24621211908E7D53F"
+							"sha1": "127B17E6E4A84647AB5B1F03E8CA16935AC33D89"
 						}
 					],
 					"requiredModules": [
@@ -166,7 +178,7 @@
 			"description": "Load C libraries with ease.",
 			"channels": {
 				"release": {
-					"version": "0.1.0",
+					"version": "0.1.1",
 					"released": "2015-05-01",
 					"default": true,
 					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
@@ -174,7 +186,7 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "FF2A6BDF8370E774C90360BA421983157542C21D"
+							"sha1": "AA4CACF574DAC8A59888EA418487AFD12CABE3F9"
 						}
 					],
 					"requiredModules": [
