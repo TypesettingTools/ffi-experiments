@@ -8,15 +8,15 @@ void Sleep(unsigned long);
 
 
 PTVersion = 0x000100
-PT, loadedLibraryPath = requireffi "PT.PreciseTimer"
+PT, loadedLibraryPath = requireffi "PT.PreciseTimer.PreciseTimer"
 libVer = PT.version!
 if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/65536%256)
 	error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
 
 class PreciseTimer
-	@version = 0x000104
-	@version_string = "0.1.4"
-	@attachDepctrl = (DependencyControl) ->
+	@version = 0x000105
+	@version_string = "0.1.5"
+	@__depCtrlInit = ( DependencyControl ) ->
 		@version = DependencyControl {
 			name: "#{@__name}",
 			version: @version_string,

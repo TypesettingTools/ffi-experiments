@@ -4,7 +4,7 @@ ffi.cdef [[
 ___INCLUDE___
 ]]
 
-BM, loadedLibraryPath = requireffi "BM.BadMutex"
+BM, loadedLibraryPath = requireffi "BM.BadMutex.BadMutex"
 BMVersion = 0x000100
 libVer = BM.version!
 if libVer < BMVersion or math.floor(libVer/65536%256) > math.floor(BMVersion/65536%256)
@@ -21,8 +21,8 @@ BadMutex = {
 	unlock: ->
 		BM.unlock!
 
-	version: 0x000102
-	attachDepctrl: (DependencyControl) ->
+	version: 0x000103
+	__depCtrlInit: ( DependencyControl ) ->
 		BadMutex.version = DependencyControl {
 			name: "BadMutex",
 			version: BadMutex.version,

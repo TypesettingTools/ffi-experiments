@@ -70,7 +70,7 @@ char *_strdup(const char *);
 ]]
 
 DMVersion = 0x000300
-DM, loadedLibraryPath = requireffi "DM.DownloadManager"
+DM, loadedLibraryPath = requireffi "DM.DownloadManager.DownloadManager"
 libVer = DM.version!
 if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
 	error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
@@ -79,9 +79,9 @@ sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 
 strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
 
 class DownloadManager
-	@version = 0x000300
-	@version_string = "0.3.0"
-	@attachDepctrl = (DependencyControl) ->
+	@version = 0x000301
+	@version_string = "0.3.1"
+	@__depCtrlInit = ( DependencyControl ) ->
 		@version = DependencyControl {
 			name: "#{@__name}",
 			version: @version_string,

@@ -3,7 +3,7 @@
 
 -- example: DM = requireffi("DM.DownloadManager")
 
-version = '0.1.0'
+version = '0.1.1'
 ffi = require 'ffi'
 libPrefix, libSuffix = 'lib', '.so'
 switch ffi.os
@@ -55,7 +55,7 @@ requireffi = ( name ) =>
 local versionRecord
 versionRecord = {
 	:version,
-	attachDepctrl: (DependencyControl) ->
+	__depCtrlInit: ( DependencyControl ) ->
 		versionRecord.version = DependencyControl {
 			name: "requireffi",
 			version: version,
