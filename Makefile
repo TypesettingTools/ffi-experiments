@@ -33,6 +33,8 @@ PT_OBJECTS := $(addprefix $(OBJDIR)/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
 PreciseTimer := $(OBJDIR)/libPreciseTimer$(LIB_EXT)
 PreciseTimerLua := $(OBJDIR)/PreciseTimer.lua
 
+RequireFFILua := $(OBJDIR)/requireffi.lua
+
 .PHONY: all BadMutex DownloadManager PreciseTimer lua clean
 all: BadMutex DownloadManager PreciseTimer
 
@@ -88,7 +90,11 @@ $(PreciseTimerLua): $(OBJDIR)
 	@printf "\e[1;35mMOONC\e[m $@\n"
 	$(shell ./BuildLua.sh precise-timer PreciseTimer $@)
 
-lua: $(BadMutexLua) $(DownloadManagerLua) $(PreciseTimerLua)
+$(RequireFFILua): $(OBJDIR)
+	@printf "\e[1;35mMOONC\e[m $@\n"
+	$(shell moonc -o $@ requireffi/requireffi.moon 2> /dev/null)
+
+lua: $(BadMutexLua) $(DownloadManagerLua) $(PreciseTimerLua) $(RequireFFILua)
 
 clean:
 	@printf "\e[1;31m   RM\e[m $(OBJDIR)\n"
