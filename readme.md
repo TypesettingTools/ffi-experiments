@@ -45,4 +45,4 @@ addition to some of the above requirements, you must have:
 All of the lua scripts must be built simultaneously, for reasons
 completely unrelated to my indolence.
 
-[binary]: releases/tag/r3
+[binary]: ../../releases/tag/r3
