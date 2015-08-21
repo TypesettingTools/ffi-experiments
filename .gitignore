@@ -3,6 +3,7 @@
 *.o
 *.dylib
 *.so
+build*
 
 # Visual Studio junk
 *.pdb
