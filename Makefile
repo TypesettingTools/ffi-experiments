@@ -17,19 +17,19 @@ endif
 
 CPPSOURCES  := $(wildcard bad-mutex/*.cpp)
 CSOURCES    := $(wildcard bad-mutex/*.c)
-BM_OBJECTS  := $(addprefix build/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
+BM_OBJECTS  := $(addprefix $(OBJDIR)/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
 BadMutex    := $(OBJDIR)/libBadMutex$(LIB_EXT)
 BadMutexLua := $(OBJDIR)/BadMutex.lua
 
 CPPSOURCES  := $(wildcard threaded-libcurl/*.cpp)
 CSOURCES    := $(wildcard threaded-libcurl/*.c)
-DM_OBJECTS  := $(addprefix build/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
+DM_OBJECTS  := $(addprefix $(OBJDIR)/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
 DownloadManager := $(OBJDIR)/libDownloadManager$(LIB_EXT)
 DownloadManagerLua := $(OBJDIR)/DownloadManager.lua
 
 CPPSOURCES := $(wildcard precise-timer/*.cpp)
 CSOURCES   := $(wildcard precise-timer/*.c)
-PT_OBJECTS := $(addprefix build/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
+PT_OBJECTS := $(addprefix $(OBJDIR)/, $(CPPSOURCES:.cpp=.o) $(CSOURCES:.c=.o))
 PreciseTimer := $(OBJDIR)/libPreciseTimer$(LIB_EXT)
 PreciseTimerLua := $(OBJDIR)/PreciseTimer.lua
 
