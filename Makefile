@@ -53,6 +53,9 @@ $(BadMutex): $(BM_OBJECTS)
 $(DownloadManager): LDFLAGS += -lcurl
 ifeq ($(UNAME),Darwin)
 $(DownloadManager): LDFLAGS += -framework CoreFoundation -framework SystemConfiguration
+else
+# std::thread won't work without explicitly linking pthreads on linux.
+$(DownloadManager): LDFLAGS += -pthread
 endif
 $(DownloadManager): $(DM_OBJECTS)
 	@printf "\e[1;32m LINK\e[m $@\n"
@@ -74,7 +77,7 @@ $(OBJDIR):
 	@printf "\e[1;33mMKDIR\e[m $@\n"
 	@mkdir -p $@
 
-$(OBJDIR)/%/: $(OBJDIR)
+$(OBJDIR)/%/: | $(OBJDIR)
 	@printf "\e[1;33mMKDIR\e[m $@\n"
 	@mkdir -p $@
 
