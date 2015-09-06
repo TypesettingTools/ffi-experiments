@@ -81,19 +81,19 @@ $(OBJDIR)/%/: | $(OBJDIR)
 	@printf "\e[1;33mMKDIR\e[m $@\n"
 	@mkdir -p $@
 
-$(BadMutexLua): $(OBJDIR)
+$(BadMutexLua): bad-mutex/BadMutex.moon | $(OBJDIR)
 	@printf "\e[1;35mMOONC\e[m $@\n"
 	$(shell ./BuildLua.sh bad-mutex BadMutex $@)
 
-$(DownloadManagerLua): $(OBJDIR)
+$(DownloadManagerLua): threaded-libcurl/DownloadManager.moon | $(OBJDIR)
 	@printf "\e[1;35mMOONC\e[m $@\n"
 	$(shell ./BuildLua.sh threaded-libcurl DownloadManager $@)
 
-$(PreciseTimerLua): $(OBJDIR)
+$(PreciseTimerLua): precise-timer/PreciseTimer.moon | $(OBJDIR)
 	@printf "\e[1;35mMOONC\e[m $@\n"
 	$(shell ./BuildLua.sh precise-timer PreciseTimer $@)
 
-$(RequireFFILua): $(OBJDIR)
+$(RequireFFILua): | $(OBJDIR)
 	@printf "\e[1;35mMOONC\e[m $@\n"
 	$(shell moonc -o $@ requireffi/requireffi.moon 2> /dev/null)
 
