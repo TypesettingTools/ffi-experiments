@@ -10,14 +10,17 @@
 #include "WinCompat.h"
 
 static size_t curlWriteCallback( char *buffer, size_t size, size_t nitems, void *userdata ) {
+	DEBUG_LOG( "Write callback." );
 	return static_cast<Downloader*>(userdata)->writeCallback( buffer, size*nitems );
 }
 
 static int curlProgressCallback( void *userdata, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow ) {
+	// DEBUG_LOG( "Progress callback." );
 	return static_cast<Downloader*>(userdata)->progressCallback( dltotal, dlnow );
 }
 
 static size_t curlHeaderCallback( char *buffer, size_t size, size_t nitems, void *userdata ) {
+	// DEBUG_LOG( "raw header callback." );
 	return static_cast<Downloader*>(userdata)->headerCallback( buffer, size*nitems );
 }
 
@@ -31,6 +34,7 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 }
 
 Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, char **theEtag ) {
+	DEBUG_LOG( "Constructor with no sha1." );
 	url     = theUrl;
 	outfile = theOutfile;
 	if (theEtag != NULL)
@@ -73,9 +77,11 @@ size_t Downloader::writeCallback( const char *buffer, size_t size ) {
 
 size_t Downloader::headerCallback( const char *buffer, size_t size ) {
 	if (strncmp( buffer, "HTTP/1.1 304 Not Modified", 25 ) == 0) {
+		DEBUG_LOG( "304 not modified got." );
 		modified = false;
 	}
 	if (strncmp( buffer, "ETag: ", 6 ) == 0) {
+		DEBUG_LOG( "An etag was got" );
 		// don't leak old etag string.
 		free( *etag );
 		// cut off an extra two chars because buffer is CRLF terminated.
@@ -87,8 +93,11 @@ size_t Downloader::headerCallback( const char *buffer, size_t size ) {
 }
 
 void Downloader::finalize( void ) {
-	if (terminated)
+	DEBUG_LOG( "Finalize." );
+	if (terminated) {
+		DEBUG_LOG( "Download was terminated." );
 		return;
+	}
 
 	if (hasSHA1) {
 		uint8_t digest[SHA1_DIGEST_SIZE];
@@ -102,6 +111,7 @@ void Downloader::finalize( void ) {
 		}
 	}
 	if (modified) {
+		DEBUG_LOG( "Download was modified. Writing." );
 		std::fstream outStream( outfile, std::ios::out | std::ios::binary );
 		if (outStream.fail( )) {
 			error = "Couldn't open output file: " + outfile;
@@ -112,9 +122,11 @@ void Downloader::finalize( void ) {
 		outStream << outBuffer;
 		outStream.close( );
 	}
+	DEBUG_LOG( "We're done here." );
 }
 
 void Downloader::process( void ) {
+	DEBUG_LOG( "Thread has been started." );
 	char curlError[CURL_ERROR_SIZE];
 	CURL *curl = curl_easy_init( );
 	struct curl_slist *slist = NULL;
@@ -183,6 +195,7 @@ void Downloader::process( void ) {
 		goto fail;
 	}
 
+	DEBUG_LOG( "Running curl_easy_perform." );
 	switch (curl_easy_perform( curl )) {
 	case CURLE_OK:
 		break;
