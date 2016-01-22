@@ -3,7 +3,7 @@
 
 -- example: DM = requireffi("DM.DownloadManager")
 
-version = '0.1.1'
+version = '0.1.2'
 ffi = require 'ffi'
 libPrefix, libSuffix = 'lib', '.so'
 switch ffi.os
@@ -13,7 +13,7 @@ switch ffi.os
 	when 'OSX'
 		libSuffix = '.dylib'
 
-packagePaths = ( namespace, libraryName ) ->
+packagePaths = ( namespace, libraryName, useCLibrarySearchPath ) ->
 	paths = { }
 	fixedLibraryName = namespace .. '/' .. libPrefix .. libraryName .. libSuffix
 	package.path\gsub "([^;]+)", ( path ) ->
@@ -27,7 +27,9 @@ packagePaths = ( namespace, libraryName ) ->
 
 	-- Inserting the plain libraryName will cause luajit to search system
 	-- C library paths for the library as well.
-	table.insert paths, libraryName
+	if useCLibrarySearchPath
+		table.insert paths, libraryName
+
 	return paths
 
 tryLoad = ( name, paths ) ->
@@ -42,7 +44,7 @@ tryLoad = ( name, paths ) ->
 
 	error table.concat messages, "\n"
 
-requireffi = ( name ) =>
+requireffi = ( name, useCLibrarySearchPath = true ) =>
 	local libraryName
 	namespace = name\gsub '%.?([^%.]+)$', ( libName ) ->
 		libraryName = libName
@@ -50,7 +52,7 @@ requireffi = ( name ) =>
 
 	namespace = namespace\gsub '%.', '/'
 
-	return tryLoad name, packagePaths namespace, libraryName
+	return tryLoad name, packagePaths namespace, libraryName, useCLibrarySearchPath
 
 local versionRecord
 versionRecord = {

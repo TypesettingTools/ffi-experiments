@@ -56,7 +56,7 @@
 						},
 						{
 							"moduleName": "requireffi.requireffi",
-							"version": "0.1.0",
+							"version": "0.1.2",
 							"feed": "@{feed:this}"
 						}
 					]
@@ -110,7 +110,7 @@
 						},
 						{
 							"moduleName": "requireffi.requireffi",
-							"version": "0.1.0",
+							"version": "0.1.2",
 							"feed": "@{feed:this}"
 						}
 					]
@@ -164,7 +164,7 @@
 						},
 						{
 							"moduleName": "requireffi.requireffi",
-							"version": "0.1.0",
+							"version": "0.1.2",
 							"feed": "@{feed:this}"
 						}
 					]
@@ -178,8 +178,8 @@
 			"description": "Load C libraries with ease.",
 			"channels": {
 				"release": {
-					"version": "0.1.1",
-					"released": "2015-05-01",
+					"version": "0.1.2",
+					"released": "2016-01-22",
 					"default": true,
 					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
 					"files": [
