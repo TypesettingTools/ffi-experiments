@@ -10,14 +10,14 @@ extern "C" {
 
 	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outfile, const char *sha1, char **etag) {
 		switch (((sha1 == NULL) << 1) | (etag == NULL)) {
-		case 0: // neither are null
-		case 1: // etag is null
-			return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile), std::string(sha1), etag );
+			case 0: // neither are null
+			case 1: // etag is null
+				return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile), std::string(sha1), etag );
 
-		case 2: // sha1 is null
-		case 3: // both are null
-		default:
-			return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile), etag );
+			case 2: // sha1 is null
+			case 3: // both are null
+			default:
+				return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile), etag );
 		}
 	}
 

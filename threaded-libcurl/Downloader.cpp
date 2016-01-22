@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "DebugLog.h"
 #include "Downloader.hpp"
 #include "WinCompat.h"
 
@@ -25,6 +26,7 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	for( unsigned int offset = 0; offset < SHA1_DIGEST_SIZE; offset++ ) {
 		snprintf( hash + 2*offset, 3, "%02x", digest[offset] );
 	}
+	DEBUG_LOG( "Calculated download sha1sum: " << std::string(hash) );
 	return std::string(hash);
 }
 
@@ -38,6 +40,7 @@ Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile
 }
 
 Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1, char **theEtag ) {
+	DEBUG_LOG( "Constructor sha1sum: " << theSha1 );
 	url     = theUrl;
 	outfile = theOutfile;
 	if (theEtag != NULL)
@@ -72,7 +75,7 @@ size_t Downloader::headerCallback( const char *buffer, size_t size ) {
 	if (strncmp( buffer, "HTTP/1.1 304 Not Modified", 25 ) == 0) {
 		modified = false;
 	}
-	if (strncmp( buffer, "ETag: ", 6) == 0) {
+	if (strncmp( buffer, "ETag: ", 6 ) == 0) {
 		// don't leak old etag string.
 		free( *etag );
 		// cut off an extra two chars because buffer is CRLF terminated.
@@ -90,6 +93,7 @@ void Downloader::finalize( void ) {
 	if (hasSHA1) {
 		uint8_t digest[SHA1_DIGEST_SIZE];
 		SHA1_Final( &sha1ctx, digest );
+		DEBUG_LOG( "Finalizer sha1sum: " << sha1 );
 		auto result = digestToHex( digest );
 		if ( result != sha1 ) {
 			error = "Hash mismatch. Got " + result + ", expected " + sha1;

@@ -2,7 +2,7 @@ CC    := gcc
 CXX   := g++
 UNAME := $(shell uname -s)
 
-OPTIMIZATION := -O3 -fPIC
+OPTIMIZATION := -O3 -fPIC -DNDEBUG
 WARNINGS := -Wall -Wunreachable-code -Wfloat-equal -Wredundant-decls -Winit-self -Wpedantic
 CFLAGS   := $(WARNINGS) $(OPTIMIZATION) -std=c99
 CXXFLAGS := $(WARNINGS) $(OPTIMIZATION) -std=c++11
@@ -35,8 +35,13 @@ PreciseTimerLua := $(OBJDIR)/PreciseTimer.lua
 
 RequireFFILua := $(OBJDIR)/requireffi.lua
 
-.PHONY: all BadMutex DownloadManager PreciseTimer lua clean
+.PHONY: all debug BadMutex DownloadManager PreciseTimer lua clean
 all: BadMutex DownloadManager PreciseTimer
+
+debug: CFLAGS += -g -O1 -UNDEBUG
+debug: CXXFLAGS += -g -O1 -UNDEBUG
+debug: LDFLAGS += -g
+debug: all
 
 BadMutex: $(BadMutex)
 DownloadManager: $(DownloadManager)
