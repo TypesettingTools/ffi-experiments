@@ -111,6 +111,55 @@ sanitizeFile = ( filename, acceptDir ) ->
 
 	return dir .. file
 
+class ETagCache
+	-- DM class ensure cacheDir is an absolute file path and ends with a /.
+	new: ( cacheDir ) =>
+		@cacheDir = cacheDir
+
+	cachedFile: ( cacheName ) =>
+		return @cacheDir .. cacheName
+
+	cachedFileExists: ( cacheName ) =>
+		if cacheName == nil
+			return false
+
+		file = io.open @cachedFile( cacheName ), 'rb'
+		if file == nil
+			return false
+		file\close!
+		return true
+
+	copyFile = ( source, target ) ->
+		input, msg = io.open source, 'rb'
+		if input == nil
+			return input, msg
+		-- assert input, msg
+		output, msg = io.open target, 'wb'
+		if output == nil
+			input\close!
+			return output, msg
+		-- assert output, msg
+		err, msg = output\write input\read '*a'
+		if err == nil
+			input\close!
+			output\close!
+			return err, msg
+
+		input\close!
+		output\close!
+		return true
+
+	useCache: ( download ) =>
+		err, msg = copyFile @cachedFile( download.etag ), download.outfile
+		if err == nil
+			return err, msg
+		return true
+
+	cache: ( download ) =>
+		err, msg = copyFile download.outfile, @cachedFile download.etag
+		if err == nil
+			return err, msg
+		return true
 
 class DownloadManager
 	@version = 0x000400
@@ -141,40 +190,11 @@ class DownloadManager
 	new: ( etagCacheDir ) =>
 		@manager = ffi.gc DM.newDM!, freeManager
 		@downloads       = { }
-		@downloadCount   = 0
 		@failedDownloads = { }
-		@failedCount     = 0
 		if etagCacheDir
 			result, message  = sanitizeFile etagCacheDir\gsub( "[/\\]*$", "/", 1 ), true
 			assert message == nil, message
-			@cacheDir        = result
-	getCachedFile = ( etag ) =>
-		return @cacheDir .. etag
-
-	copyFile = ( source, target ) ->
-		-- actually handling errors is for big chumps.
-		input,  msg = io.open source, 'rb'
-		assert input, msg
-		output, msg = io.open target, 'wb'
-		assert output, msg
-		err,    msg = output\write input\read '*a'
-		assert err, msg
-		input\close!
-		output\close!
-
-	etagCacheCheck = ( manager ) =>
-		source = getCachedFile manager, @newEtag
-		-- if the newEtag matches the provided etag then nothing was
-		-- actually downloaded, so we need to copy the cached file to the
-		-- expected output.
-		if @newEtag == @etag
-			-- should probably check if source exists.
-			copyFile source, @outfile
-
-		-- otherwise, the file was downloaded and we need to copy it into
-		-- our etag cache directory.
-		else
-			copyFile @outfile, source
+			@cache = ETagCache result
 
 	addDownload: ( url, outfile, sha1, etag ) =>
 		return nil, msgs.notInitialized unless DM
@@ -193,11 +213,19 @@ class DownloadManager
 		else
 			sha1 = nil
 
+		if etag and "string" != type etag
+			etag = nil
+		if etag and @cache and not @cache\cachedFileExists etag
+			-- if cached file does not exist, do not pass in an etag.
+			etag = nil
 
-		DM.addDownload @manager, url, outfile, sha1, cEtag
-		@downloadCount += 1
-		@downloads[@downloadCount] = { id: @downloadCount, :url, :outfile, :sha1, :etag, :cEtag }
-		return @downloads[@downloadCount]
+		id = DM.addDownload @manager, url, outfile, sha1, etag
+		if id == 0
+			return nil, "Could not add download for some reason."
+
+		download = { :id, :url, :outfile, :sha1, :etag }
+		table.insert @downloads, download
+		return download
 
 	progress: =>
 		return nil, msgs.notInitialized unless DM
@@ -215,8 +243,6 @@ class DownloadManager
 		DM.clear @manager
 		@downloads = {}
 		@failedDownloads = {}
-		@downloadCount = 0
-		@failedCount = 0
 
 	waitForFinish: ( callback ) =>
 		return nil, msgs.notInitialized unless DM
@@ -226,27 +252,30 @@ class DownloadManager
 				return
 			sleep!
 
-		@failedCount = 0
-		for i = 1, @downloadCount
-			download = @downloads[i]
-			if download.cEtag != nil
-				if download.cEtag[0] != nil
-					download.newEtag = ffi.string download.cEtag[0]
-				-- I think this actually leaks the string at cEtag[0].
-				download.cEtag = nil
+		pushFailed = ( download, message ) ->
+			download.failed = true
+			download.error = message
+			table.insert @failedDownloads, download
 
-			err = DM.getError @manager, i
+		-- all downloads are finished at this point
+		for download in *@downloads
+
+			err = DM.getError @manager, download.id
 			if err != nil
-				@failedCount += 1
-				@failedDownloads[@failedCount] = download
-				download.error = ffi.string err
-				download.failed = true
+				pushFailed download, ffi.string err
 
-			if @cacheDir and download.newEtag and not download.failed
-				err, msg = pcall etagCacheCheck, download, @
-				if not err
-					download.error = "Etag cache check failed with message: " .. msg
-					download.failed = true
+			if @cache
+				if DM.fileWasCached download.id
+					err, msg = @cache\useCache download
+					if err == nil
+						pushFailed download, "Couldn't use cache. Message: " .. msg
+
+				else
+					newETag = DM.getETag download.id
+					if newETag != nil
+						download.etag = ffi.string newETag
+						-- not technically an error if this fails
+						@cache\cache download
 
 			if "function" == type download.callback
 				download\callback @
