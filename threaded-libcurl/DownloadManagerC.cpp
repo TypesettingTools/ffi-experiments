@@ -36,16 +36,26 @@ extern "C" {
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
-	EXPORT const char* getFileHash( const char *filename ) {
-		auto result = DownloadManager::getFileHash( std::string( filename ) );
-		if ( result == "" )
-			return NULL;
+	EXPORT const char* getFileSHA1( const char *filename ) {
+		if (filename == nullptr)
+			return nullptr;
+
+		auto result = DownloadManager::getFileSHA1( std::string( filename ) );
+		if (result == "")
+			return nullptr;
 
 		return result.c_str( );
 	}
 
-	EXPORT const char* getStringHash( const char *string ) {
-		return DownloadManager::getStringHash( std::string( string ) ).c_str( );
+	EXPORT const char* getStringSHA1( const char *string ) {
+		if (string == nullptr)
+			return nullptr;
+
+		auto result = DownloadManager::getStringSHA1( std::string( string ) );
+		if (result == "")
+			return nullptr;
+
+		return result.c_str( );
 	}
 
 	EXPORT uint version( void ) {

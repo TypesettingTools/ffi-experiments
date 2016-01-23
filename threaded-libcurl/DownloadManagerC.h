@@ -20,15 +20,17 @@ typedef unsigned int uint;
 EXPORT CDlM*       newDM         ( void );
 EXPORT uint        addDownload   ( CDlM *mgr,              const char *url,
                                    const char *outputFile, const char *expectedHash,
-                                   const char *expectedEtag );
+                                   const char *expectedETag );
 EXPORT double      progress      ( CDlM *mgr );
 EXPORT int         busy          ( CDlM *mgr );
 EXPORT int         checkDownload ( CDlM *mgr, uint i );
 EXPORT const char* getError      ( CDlM *mgr, uint i );
+EXPORT bool        fileWasCached ( CDlM *mgr, uint i );
+EXPORT const char* getETag       ( CDlM *mgr, uint i );
 EXPORT void        terminate     ( CDlM *mgr );
 EXPORT void        clear         ( CDlM *mgr );
-EXPORT const char* getFileHash   ( const char *filename );
-EXPORT const char* getStringHash ( const char *string );
+EXPORT const char* getFileSHA1   ( const char *filename );
+EXPORT const char* getStringSHA1 ( const char *string );
 EXPORT uint        version       ( void );
 EXPORT void        freeDM        ( CDlM *mgr );
 EXPORT bool        isInternetConnected( void );

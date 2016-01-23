@@ -7,7 +7,6 @@
 
 #include "DebugLog.h"
 #include "Downloader.hpp"
-#include "WinCompat.h"
 
 static size_t curlWriteCallback( char *buffer, size_t size, size_t nitems, void *userdata ) {
 	DEBUG_LOG( "Write callback." );
@@ -31,7 +30,7 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	return std::string(hash);
 }
 
-Downloader::Downloader( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag )
+Downloader::Downloader( const char *url, const char *outputFile, const char *expectedHash, const char *expectedETag )
 // url and outputFile are checked to be nonnull by DownloadManager.
 : url(url), outputFile(outputFile) {
 	if ( expectedHash != nullptr ) {
@@ -39,9 +38,9 @@ Downloader::Downloader( const char *url, const char *outputFile, const char *exp
 		hasExpectedHash = true;
 		SHA1_Init( &sha1ctx );
 	}
-	if ( expectedEtag != nullptr ) {
-		this->expectedEtag = std::string( expectedEtag );
-		hasExpectedEtag = true;
+	if ( expectedETag != nullptr ) {
+		this->expectedETag = std::string( expectedETag );
+		hasExpectedETag = true;
 	}
 
 	thread = std::thread( &Downloader::process, this );
@@ -76,8 +75,8 @@ size_t Downloader::headerCallback( const char *buffer, size_t size ) {
 		DEBUG_LOG( "An etag header was found" );
 		// cut off an extra three chars because buffer is CRLF terminated
 		// and the ETag is in quotation marks.
-		actualEtag.append( buffer + 7, size - 10 );
-		DEBUG_LOG( "Etag: " << actualEtag );
+		actualETag.append( buffer + 7, size - 10 );
+		DEBUG_LOG( "ETag: " << actualETag );
 	}
 	return size;
 }
@@ -129,9 +128,9 @@ void Downloader::process( void ) {
 		goto exit;
 	}
 
-	if (hasExpectedEtag) {
+	if (hasExpectedETag) {
 		char header[256];
-		snprintf( header, 256, "If-None-Match: \"%s\"", expectedEtag.c_str( ) );
+		snprintf( header, 256, "If-None-Match: \"%s\"", expectedETag.c_str( ) );
 		slist = curl_slist_append( slist, header );
 		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HTTPHEADER, slist )) {
 			errorMessage = "Could not set http headers.";

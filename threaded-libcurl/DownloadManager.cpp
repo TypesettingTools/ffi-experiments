@@ -35,11 +35,11 @@ double DownloadManager::getProgress( void ) {
 	return (addedCount > 0)? progress/addedCount: 0;
 }
 
-unsigned int DownloadManager::addDownload( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag ) {
-	if ( url == nullptr || outputFile == nullptr ) {
+unsigned int DownloadManager::addDownload( const char *url, const char *outputFile, const char *expectedHash, const char *expectedETag ) {
+	if ( url == nullptr || outputFile == nullptr )
 		return 0;
-	}
-	downloaders.push_back( new Downloader( url, outputFile, expectedHash, expectedEtag ) );
+
+	downloaders.push_back( new Downloader( url, outputFile, expectedHash, expectedETag ) );
 	return ++addedCount;
 }
 
@@ -70,22 +70,29 @@ int DownloadManager::checkDownload( unsigned int i ) {
 }
 
 const char* DownloadManager::getError( unsigned int i ) {
-	if (i > addedCount) {
+	if (i > addedCount)
 		return "Not a download.";
-	}
+
 	auto downloader = downloaders[i-1];
-	if (downloader->hasFailed) {
+	if (downloader->hasFailed)
 		return downloader->errorMessage.c_str( );
-	}
+
 	return nullptr;
 }
 
-const char* DownloadManager::getEtag( unsigned int i ) {
+bool DownloadManager::fileWasCached( unsigned int i ) {
+	if (i > addedCount)
+		return false;
+	auto downloader = downloaders[i-1];
+	return downloader->isCachedFile;
+}
+
+const char* DownloadManager::getETag( unsigned int i ) {
 	if (i > addedCount)
 		return nullptr;
 
 	auto downloader = downloaders[i-1];
-	return downloader->actualEtag.c_str( );
+	return downloader->actualETag.c_str( );
 }
 
 int DownloadManager::busy( void ) {

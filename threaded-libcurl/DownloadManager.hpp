@@ -13,10 +13,11 @@ class DownloadManager {
 		DownloadManager( void );
 		~DownloadManager( void );
 		double getProgress( void );
-		unsigned int addDownload( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag );
+		unsigned int addDownload( const char *url, const char *outputFile, const char *expectedHash, const char *expectedETag );
 		int checkDownload( unsigned int i );
 		const char* getError( unsigned int i );
-		const char* getEtag( unsigned int i );
+		bool fileWasCached( unsigned int i );
+		const char* getETag( unsigned int i );
 		void terminate( void );
 		void clear( void );
 		int busy( void );
