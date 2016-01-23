@@ -96,7 +96,7 @@ int DownloadManager::busy( void ) {
 // should probably not be used on multi-gigabyte files, since it tries
 // to dump the entire file into an array at once. Perhaps a filesize
 // check for switching behavior should be added.
-std::string DownloadManager::getFileHash( const std::string &filename ) {
+std::string DownloadManager::getFileSHA1( const std::string &filename ) {
 	std::string buffer;
 	std::fstream inFile( filename, std::ios::in | std::ios::binary | std::ios::ate );
 	if (inFile.is_open( )) {
@@ -104,12 +104,12 @@ std::string DownloadManager::getFileHash( const std::string &filename ) {
 		inFile.seekg( 0, std::ios::beg );
 		inFile.read( &buffer[0], buffer.size( ) );
 		inFile.close( );
-		return getStringHash( buffer );
+		return getStringSHA1( buffer );
 	}
 	return "";
 }
 
-std::string DownloadManager::getStringHash( const std::string &string ) {
+std::string DownloadManager::getStringSHA1( const std::string &string ) {
 	SHA1_CTX ctx;
 	uint8_t digest[SHA1_DIGEST_SIZE];
 	SHA1_Init( &ctx );

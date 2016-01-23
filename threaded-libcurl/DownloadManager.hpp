@@ -19,7 +19,7 @@ class DownloadManager {
 		void terminate( void );
 		void clear( void );
 		int busy( void );
-		static std::string getFileHash( const std::string &filename );
-		static std::string getStringHash( const std::string &string );
+		static std::string getFileSHA1( const std::string &filename );
+		static std::string getStringSHA1( const std::string &string );
 		static bool isInternetConnected();
 };
