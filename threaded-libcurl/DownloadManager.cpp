@@ -80,6 +80,14 @@ const char* DownloadManager::getError( unsigned int i ) {
 	return nullptr;
 }
 
+const char* DownloadManager::getEtag( unsigned int i ) {
+	if (i > addedCount)
+		return nullptr;
+
+	auto downloader = downloaders[i-1];
+	return downloader->actualEtag.c_str( );
+}
+
 int DownloadManager::busy( void ) {
 	for (const auto &downloader : downloaders) {
 		if (downloader->assimilate( )) {

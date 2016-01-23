@@ -16,6 +16,7 @@ class DownloadManager {
 		unsigned int addDownload( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag );
 		int checkDownload( unsigned int i );
 		const char* getError( unsigned int i );
+		const char* getEtag( unsigned int i );
 		void terminate( void );
 		void clear( void );
 		int busy( void );
