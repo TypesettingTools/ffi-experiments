@@ -77,6 +77,42 @@ if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/655
 
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
+sanitizeFile = ( filename, acceptDir ) ->
+	-- expand leading ~.
+	if homeDir = os.getenv "HOME"
+		filename = filename\gsub "^~/", homeDir .. "/"
+
+	dev, dir, file = filename\match "^(#{ffi.os == 'Windows' and '%a:[/\\]' or '/'})(.*[/\\])(.*)$"
+
+	-- check that filename is a full path as we don't support relative
+	-- ones or automatic file naming
+	if not dev or #dir < 1
+		return nil, msgs.outNoFullPath\format filename
+	elseif not acceptDir and #file < 1
+		return nil, msgs.outNoFile\format filename
+
+	dir = dev .. dir
+	if havelfs
+		-- check that directory exists, but only if we have lfs.
+		mode, err = lfs.attributes dir, "mode"
+		if mode != "directory"
+			-- lfs.attributes returns nil and no error if the folder wasn't
+			-- found
+			if err
+				return nil, err
+			-- create directory
+			res, err = lfs.mkdir dir
+			-- lfs.mkdir returns nil on success and error alike
+			if err
+				return nil, err
+
+	else
+		-- probably should care about the return code
+		-- HAHA THIS IS HIDEOUSLY DANGEROUS, HOLY MOLEY
+		os.execute "mkdir #{ffi.os == 'Windows' and '' or '-p '}\"#{dir}\""
+
+	return dir .. file
+
 
 class DownloadManager
 	@version = 0x000400
@@ -114,40 +150,6 @@ class DownloadManager
 			result, message  = sanitizeFile etagCacheDir\gsub( "[/\\]*$", "/", 1 ), true
 			assert message == nil, message
 			@cacheDir        = result
-
-	sanitizeFile = ( filename, acceptDir ) ->
-		-- expand leading ~.
-		if homeDir = os.getenv "HOME"
-			filename = filename\gsub "^~/", homeDir .. "/"
-
-		dev, dir, file = filename\match "^(#{ffi.os == 'Windows' and '%a:[/\\]' or '/'})(.*[/\\])(.*)$"
-
-		-- check that filename is a full path as we don't support relative
-		-- ones or automatic file naming
-		if not dev or #dir < 1
-			return nil, msgs.outNoFullPath\format filename
-		elseif not acceptDir and #file < 1
-			return nil, msgs.outNoFile\format filename
-
-		dir = dev .. dir
-		if havelfs
-			-- check that directory exists, but only if we have lfs.
-			mode, err = lfs.attributes dir, "mode"
-			if mode != "directory"
-				-- lfs.attributes returns nil and no error if the folder wasn't
-				-- found
-				return nil, err if err
-				-- create directory
-				res, err = lfs.mkdir dir
-				-- lfs.mkdir returns nil on success and error alike
-				return nil, err if err
-
-		else
-			-- probably should care about the return code
-			os.execute "mkdir #{ffi.os == 'Windows' and '' or '-p '}\"#{dir}\""
-
-		return dir .. file
-
 	getCachedFile = ( etag ) =>
 		return @cacheDir .. etag
 
