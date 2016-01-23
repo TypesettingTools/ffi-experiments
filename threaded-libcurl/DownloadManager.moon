@@ -69,7 +69,7 @@ char *strdup(const char *);
 char *_strdup(const char *);
 ]]
 
-DMVersion = 0x000300
+DMVersion = 0x000400
 DM, loadedLibraryPath = requireffi "DM.DownloadManager.DownloadManager"
 libVer = DM.version!
 if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
@@ -79,8 +79,8 @@ sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 
 strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
 
 class DownloadManager
-	@version = 0x000301
-	@version_string = "0.3.1"
+	@version = 0x000400
+	@version_string = "0.4.0"
 	@__depCtrlInit = ( DependencyControl ) ->
 		@version = DependencyControl {
 			name: "#{@__name}",
