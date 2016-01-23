@@ -8,31 +8,60 @@ extern "C" {
 		return reinterpret_cast<CDlM*>(new DownloadManager);
 	}
 
-	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag ) {
-		return reinterpret_cast<DownloadManager*>(mgr)->addDownload( url, outputFile, expectedHash, expectedEtag );
+	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outputFile, const char *expectedHash, const char *expectedETag ) {
+		if (mgr == nullptr)
+			return 0;
+		return reinterpret_cast<DownloadManager*>(mgr)->addDownload( url, outputFile, expectedHash, expectedETag );
 	}
 
 	EXPORT double progress( CDlM *mgr ) {
+		if (mgr == nullptr)
+			return 0;
 		return reinterpret_cast<DownloadManager*>(mgr)->getProgress( );
 	}
 
 	EXPORT int busy( CDlM *mgr ) {
+		if (mgr == nullptr)
+			return 0;
 		return reinterpret_cast<DownloadManager*>(mgr)->busy( );
 	}
 
 	EXPORT int checkDownload( CDlM *mgr, uint i ) {
+		if (mgr == nullptr)
+			return -1;
 		return reinterpret_cast<DownloadManager*>(mgr)->checkDownload( i );
 	}
 
 	EXPORT const char* getError( CDlM *mgr, uint i ) {
+		if (mgr == nullptr)
+			return nullptr;
 		return reinterpret_cast<DownloadManager*>(mgr)->getError( i );
 	}
 
+	EXPORT bool fileWasCached( CDlM *mgr, uint i ) {
+		if (mgr == nullptr)
+			return false;
+		return reinterpret_cast<DownloadManager*>(mgr)->fileWasCached( i );
+	}
+
+	EXPORT const char* getETag( CDlM *mgr, uint i ) {
+		if (mgr == nullptr)
+			return nullptr;
+		auto result = reinterpret_cast<DownloadManager*>(mgr)->getETag( i );
+		if ( result == nullptr || result[0] == '\0' )
+			return nullptr;
+		return result;
+	}
+
 	EXPORT void terminate( CDlM *mgr ) {
+		if (mgr == nullptr)
+			return;
 		reinterpret_cast<DownloadManager*>(mgr)->terminate( );
 	}
 
 	EXPORT void clear( CDlM *mgr ) {
+		if (mgr == nullptr)
+			return;
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
@@ -63,6 +92,9 @@ extern "C" {
 	}
 
 	EXPORT void freeDM( CDlM* mgr ) {
+		if (mgr == nullptr)
+			return;
+
 		delete reinterpret_cast<DownloadManager*>(mgr);
 	}
 
