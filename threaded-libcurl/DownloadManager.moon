@@ -65,8 +65,6 @@ ffi.cdef [[
 ___INCLUDE___
 int usleep(unsigned int);
 void Sleep(unsigned long);
-char *strdup(const char *);
-char *_strdup(const char *);
 ]]
 
 DMVersion = 0x000400
@@ -76,7 +74,7 @@ if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/655
 	error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
 
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
-strdup = ffi.os == "Windows" and ffi.C._strdup or ffi.C.strdup
+
 sanitizeFile = ( filename, acceptDir ) ->
 	-- expand leading ~.
 	if homeDir = os.getenv "HOME"
@@ -195,11 +193,6 @@ class DownloadManager
 		else
 			sha1 = nil
 
-		cEtag = ffi.new "char*[1]"
-		if "string" == type etag
-			cEtag[0] = strdup etag
-		else
-			cEtag[0] = strdup ""
 
 		DM.addDownload @manager, url, outfile, sha1, cEtag
 		@downloadCount += 1
