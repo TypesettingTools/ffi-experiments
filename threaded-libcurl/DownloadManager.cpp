@@ -27,35 +27,33 @@ DownloadManager::~DownloadManager( void ) {
 
 double DownloadManager::getProgress( void ) {
 	double progress = finishedCount;
-	for (const auto& downloader : downloaders) {
-		if (downloader->total > 0 && !downloader->done) {
+	for (const auto &downloader : downloaders) {
+		if (downloader->total > 0 && !downloader->isFinished) {
 			progress += downloader->current/(double)downloader->total;
 		}
 	}
 	return (addedCount > 0)? progress/addedCount: 0;
 }
 
-unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile, char **etag ) {
-	downloaders.push_back( new Downloader( url, outfile, etag ) );
-	return ++addedCount;
-}
-
-unsigned int DownloadManager::addDownload( const std::string &url, const std::string &outfile, const std::string &sha1, char **etag ) {
-	downloaders.push_back( new Downloader( url, outfile, sha1, etag ) );
+unsigned int DownloadManager::addDownload( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag ) {
+	if ( url == nullptr || outputFile == nullptr ) {
+		return 0;
+	}
+	downloaders.push_back( new Downloader( url, outputFile, expectedHash, expectedEtag ) );
 	return ++addedCount;
 }
 
 void DownloadManager::terminate( void ) {
-	for (auto& downloader : downloaders) {
-		if (!downloader->done)
-			downloader->terminated = true;
+	for (auto &downloader : downloaders) {
+		if (!downloader->isFinished)
+			downloader->wasTerminated = true;
 	}
 }
 
 void DownloadManager::clear( void ) {
 	terminate( );
-	for (auto& downloader : downloaders) {
-		downloader->join( );
+	for (auto &downloader : downloaders) {
+		downloader->assimilate( );
 		delete downloader;
 	}
 	downloaders.clear( );
@@ -68,7 +66,7 @@ int DownloadManager::checkDownload( unsigned int i ) {
 	if (i > addedCount) {
 		return -1;
 	}
-	return downloaders[i-1]->done;
+	return downloaders[i-1]->isFinished;
 }
 
 const char* DownloadManager::getError( unsigned int i ) {
@@ -76,29 +74,29 @@ const char* DownloadManager::getError( unsigned int i ) {
 		return "Not a download.";
 	}
 	auto downloader = downloaders[i-1];
-	if (downloader->failed) {
-		return downloader->error.c_str( );
+	if (downloader->hasFailed) {
+		return downloader->errorMessage.c_str( );
 	}
-	return NULL;
+	return nullptr;
 }
 
 int DownloadManager::busy( void ) {
-	int i = 1;
-	for (auto downloader = downloaders.begin( ), end = downloaders.end( ); downloader != end; ++downloader) {
-		if ((*downloader)->isFinished( )) {
-			if ((*downloader)->failed)
-				++failedCount;
-			(*downloader)->join( );
-			++finishedCount;
+	for (const auto &downloader : downloaders) {
+		if (downloader->assimilate( )) {
+			if (downloader->hasFailed) {
+				failedCount++;
+			}
+			finishedCount++;
 		}
-		++i;
 	}
 	return addedCount - finishedCount;
 }
 
-// These are kind of out of place but they are useful.
-
-std::string DownloadManager::getFileSHA1( const std::string &filename ) {
+// These are kind of out of place but they are useful. This function
+// should probably not be used on multi-gigabyte files, since it tries
+// to dump the entire file into an array at once. Perhaps a filesize
+// check for switching behavior should be added.
+std::string DownloadManager::getFileHash( const std::string &filename ) {
 	std::string buffer;
 	std::fstream inFile( filename, std::ios::in | std::ios::binary | std::ios::ate );
 	if (inFile.is_open( )) {
@@ -106,12 +104,12 @@ std::string DownloadManager::getFileSHA1( const std::string &filename ) {
 		inFile.seekg( 0, std::ios::beg );
 		inFile.read( &buffer[0], buffer.size( ) );
 		inFile.close( );
-		return getStringSHA1( buffer );
+		return getStringHash( buffer );
 	}
 	return "";
 }
 
-std::string DownloadManager::getStringSHA1( const std::string &string ) {
+std::string DownloadManager::getStringHash( const std::string &string ) {
 	SHA1_CTX ctx;
 	uint8_t digest[SHA1_DIGEST_SIZE];
 	SHA1_Init( &ctx );
@@ -132,7 +130,7 @@ bool DownloadManager::isInternetConnected() {
 
 	SCNetworkConnectionFlags flags = 0;
 	SCNetworkReachabilityRef target = SCNetworkReachabilityCreateWithAddress( kCFAllocatorDefault, &address );
-	if ( target == NULL )
+	if ( target == nullptr )
 		return false;
 
 	bool flagsValid = SCNetworkReachabilityGetFlags( target, &flags );

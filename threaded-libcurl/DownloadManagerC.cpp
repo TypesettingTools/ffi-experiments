@@ -8,17 +8,8 @@ extern "C" {
 		return reinterpret_cast<CDlM*>(new DownloadManager);
 	}
 
-	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outfile, const char *sha1, char **etag) {
-		switch (((sha1 == NULL) << 1) | (etag == NULL)) {
-			case 0: // neither are null
-			case 1: // etag is null
-				return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile), std::string(sha1), etag );
-
-			case 2: // sha1 is null
-			case 3: // both are null
-			default:
-				return reinterpret_cast<DownloadManager*>(mgr)->addDownload( std::string(url), std::string(outfile), etag );
-		}
+	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag ) {
+		return reinterpret_cast<DownloadManager*>(mgr)->addDownload( url, outputFile, expectedHash, expectedEtag );
 	}
 
 	EXPORT double progress( CDlM *mgr ) {
@@ -45,16 +36,16 @@ extern "C" {
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
-	EXPORT const char* getFileSHA1( const char *filename ) {
-		auto result = DownloadManager::getFileSHA1( std::string( filename ) );
-		if ( "" == result )
+	EXPORT const char* getFileHash( const char *filename ) {
+		auto result = DownloadManager::getFileHash( std::string( filename ) );
+		if ( result == "" )
 			return NULL;
 
 		return result.c_str( );
 	}
 
-	EXPORT const char* getStringSHA1( const char *string ) {
-		return DownloadManager::getStringSHA1( std::string( string ) ).c_str( );
+	EXPORT const char* getStringHash( const char *string ) {
+		return DownloadManager::getStringHash( std::string( string ) ).c_str( );
 	}
 
 	EXPORT uint version( void ) {

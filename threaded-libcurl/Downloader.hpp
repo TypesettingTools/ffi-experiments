@@ -9,31 +9,35 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] );
 
 class Downloader {
 	std::thread thread;
-	char **etag = NULL;
 	std::string url,
-	            outfile,
-	            sha1,
-	            outBuffer;
+	            outputFile,
+	            expectedEtag,
+	            expectedHash,
+	            outputBuffer;
 	SHA1_CTX sha1ctx;
-	bool hasSHA1  = false,
-	     modified = true,
-	     joined   = false;
+	// because std::string isn't an optional type, we'll manually track
+	// whether or not the optional constructor arguments exist.
+	bool hasExpectedHash = false,
+	     hasExpectedEtag = false,
+	     isCachedFile    = false,
+	     threadHasJoined = false;
 
 	void finalize( void );
 
 	public:
-		bool terminated = false,
-		     done       = false,
-		     failed     = false;
-	  std::string error;
+		bool wasTerminated = false,
+		     isFinished    = false,
+		     hasFailed     = false;
+		std::string actualEtag,
+		            errorMessage;
 		curl_off_t current = 0, total = 0;
 
-		Downloader( const std::string &theUrl, const std::string &theOutfile, char **theEtag );
-		Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1, char **theEtag );
+		// const char pointers are essentially the builtin nullable type so
+		// why bother using some ugly optional wrapping std::string?
+		Downloader( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag );
 		int progressCallback( curl_off_t dltotal, curl_off_t dlnow );
 		size_t writeCallback( const char *buffer, size_t size );
 		size_t headerCallback( const char *buffer, size_t size );
 		void process( void );
-		bool isFinished( void );
-		void join( void );
+		bool assimilate( void );
 };

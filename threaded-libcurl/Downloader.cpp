@@ -15,12 +15,10 @@ static size_t curlWriteCallback( char *buffer, size_t size, size_t nitems, void 
 }
 
 static int curlProgressCallback( void *userdata, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow ) {
-	// DEBUG_LOG( "Progress callback." );
 	return static_cast<Downloader*>(userdata)->progressCallback( dltotal, dlnow );
 }
 
 static size_t curlHeaderCallback( char *buffer, size_t size, size_t nitems, void *userdata ) {
-	// DEBUG_LOG( "raw header callback." );
 	return static_cast<Downloader*>(userdata)->headerCallback( buffer, size*nitems );
 }
 
@@ -33,26 +31,18 @@ std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
 	return std::string(hash);
 }
 
-Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, char **theEtag ) {
-	DEBUG_LOG( "Constructor with no sha1." );
-	url     = theUrl;
-	outfile = theOutfile;
-	if (theEtag != NULL)
-		etag  = theEtag;
-
-	thread = std::thread( &Downloader::process, this );
-}
-
-Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile, const std::string &theSha1, char **theEtag ) {
-	DEBUG_LOG( "Constructor sha1sum: " << theSha1 );
-	url     = theUrl;
-	outfile = theOutfile;
-	if (theEtag != NULL)
-		etag  = theEtag;
-
-	hasSHA1 = true;
-	sha1    = theSha1;
-	SHA1_Init( &sha1ctx );
+Downloader::Downloader( const char *url, const char *outputFile, const char *expectedHash, const char *expectedEtag )
+// url and outputFile are checked to be nonnull by DownloadManager.
+: url(url), outputFile(outputFile) {
+	if ( expectedHash != nullptr ) {
+		this->expectedHash = std::string( expectedHash );
+		hasExpectedHash = true;
+		SHA1_Init( &sha1ctx );
+	}
+	if ( expectedEtag != nullptr ) {
+		this->expectedEtag = std::string( expectedEtag );
+		hasExpectedEtag = true;
+	}
 
 	thread = std::thread( &Downloader::process, this );
 }
@@ -60,12 +50,12 @@ Downloader::Downloader( const std::string &theUrl, const std::string &theOutfile
 int Downloader::progressCallback( curl_off_t dltotal, curl_off_t dlnow ) {
 	current = dlnow;
 	total = dltotal;
-	return terminated? !CURLE_OK: CURLE_OK;
+	return wasTerminated? !CURLE_OK: CURLE_OK;
 }
 
 size_t Downloader::writeCallback( const char *buffer, size_t size ) {
-	outBuffer.append( buffer, size );
-	if (hasSHA1) {
+	outputBuffer.append( buffer, size );
+	if (hasExpectedHash) {
 		// This seems to calculate the sha1 correctly but buffer gets
 		// corrupted somehow. Is it the cast? Is it the function?
 		// SHA1_Update just memcpy's from the buffer, so it shouldn't be to
@@ -76,52 +66,55 @@ size_t Downloader::writeCallback( const char *buffer, size_t size ) {
 }
 
 size_t Downloader::headerCallback( const char *buffer, size_t size ) {
+	// This is currently the only condition where we treat the file as
+	// cached and proceed. Perhaps we should also manually compare etags?
 	if (strncmp( buffer, "HTTP/1.1 304 Not Modified", 25 ) == 0) {
 		DEBUG_LOG( "304 not modified got." );
-		modified = false;
+		isCachedFile = true;
 	}
 	if (strncmp( buffer, "ETag: ", 6 ) == 0) {
-		DEBUG_LOG( "An etag was got" );
-		// don't leak old etag string.
-		free( *etag );
-		// cut off an extra two chars because buffer is CRLF terminated.
-		*etag = (char*)malloc( size - 9 );
-		memcpy( *etag, buffer + 7, size - 10 );
-		(*etag)[size-10] = '\0';
+		DEBUG_LOG( "An etag header was found" );
+		// cut off an extra three chars because buffer is CRLF terminated
+		// and the ETag is in quotation marks.
+		actualEtag.append( buffer + 7, size - 10 );
+		DEBUG_LOG( "Etag: " << actualEtag );
 	}
 	return size;
 }
 
 void Downloader::finalize( void ) {
 	DEBUG_LOG( "Finalize." );
-	if (terminated) {
+	if (wasTerminated) {
 		DEBUG_LOG( "Download was terminated." );
+		errorMessage = "Download was terminated.";
+		hasFailed = true;
 		return;
 	}
 
-	if (hasSHA1) {
+	if (isCachedFile)
+		return;
+
+	if (hasExpectedHash) {
 		uint8_t digest[SHA1_DIGEST_SIZE];
 		SHA1_Final( &sha1ctx, digest );
-		DEBUG_LOG( "Finalizer sha1sum: " << sha1 );
+		DEBUG_LOG( "Finalizer sha1sum: " << expectedHash );
 		auto result = digestToHex( digest );
-		if ( result != sha1 ) {
-			error = "Hash mismatch. Got " + result + ", expected " + sha1;
-			failed = true;
+		if ( result != expectedHash ) {
+			errorMessage = "Hash mismatch. Got " + result + ", expected " + expectedHash;
+			hasFailed = true;
 			return;
 		}
 	}
-	if (modified) {
-		DEBUG_LOG( "Download was modified. Writing." );
-		std::fstream outStream( outfile, std::ios::out | std::ios::binary );
-		if (outStream.fail( )) {
-			error = "Couldn't open output file: " + outfile;
-			failed = true;
-			return;
-		}
+	DEBUG_LOG( "Download not cached. Writing file." );
+	std::fstream outStream( outputFile, std::ios::out | std::ios::binary );
+	if (outStream.fail( )) {
+		errorMessage = "Couldn't open output file: " + outputFile;
+		hasFailed = true;
+		return;
+	}
 
-		outStream << outBuffer;
-		outStream.close( );
-	}
+	outStream << outputBuffer;
+	outStream.close( );
 	DEBUG_LOG( "We're done here." );
 }
 
@@ -130,68 +123,68 @@ void Downloader::process( void ) {
 	char curlError[CURL_ERROR_SIZE];
 	CURL *curl = curl_easy_init( );
 	struct curl_slist *slist = NULL;
-	if ( NULL == curl ) {
-		error = "Could not initialize curl.";
-		failed = true;
+	if ( curl == nullptr ) {
+		errorMessage = "Could not initialize curl.";
+		hasFailed = true;
 		goto exit;
 	}
 
-	if ( etag != NULL ) {
+	if (hasExpectedEtag) {
 		char header[256];
-		snprintf( header, 256, "If-None-Match: \"%s\"", *etag );
+		snprintf( header, 256, "If-None-Match: \"%s\"", expectedEtag.c_str( ) );
 		slist = curl_slist_append( slist, header );
 		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HTTPHEADER, slist )) {
-			error = "Could not set http headers.";
+			errorMessage = "Could not set http headers.";
 			goto fail;
 		}
 		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HEADERDATA, this )) {
-			error = "Could not set progress callback.";
+			errorMessage = "Could not set header callback userdata.";
 			goto fail;
 		}
 		if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_HEADERFUNCTION, curlHeaderCallback ) ) {
-			error = "Could not set header callback.";
+			errorMessage = "Could not set header callback function.";
 			goto fail;
 		}
 	}
 
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_WRITEDATA, this )) {
-		error = "Could not set write callback.";
+		errorMessage = "Could not set write callback userdata.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, curlWriteCallback )) {
-		error = "Could not set write callback.";
+		errorMessage = "Could not set write callback function.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_NOPROGRESS, 0 )) {
-		error = "Could not enable progress callback????";
+		errorMessage = "Could not enable progress callback????";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_XFERINFODATA, this )) {
-		error = "Could not set progress callback.";
+		errorMessage = "Could not set progress callback userdata.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_XFERINFOFUNCTION, curlProgressCallback )) {
-		error = "Could not set progress callback.";
+		errorMessage = "Could not set progress callback function.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_FAILONERROR, 1 ) ) {
-		error = "Could not fail on error.";
+		errorMessage = "Could not fail on error.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_URL, url.c_str( ) )) {
-		error = "Could not set fetch url.";
+		errorMessage = "Could not set fetch url.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_FOLLOWLOCATION, 1 ) ) {
-		error = "Could not set redirect following.";
+		errorMessage = "Could not set redirect following.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_ERRORBUFFER, curlError )) {
-		error = "Could not set error buffer.";
+		errorMessage = "Could not set error buffer.";
 		goto fail;
 	}
 	if (CURLE_OK != curl_easy_setopt( curl, CURLOPT_ACCEPT_ENCODING, "" )) {
-		error = "Could not set Accept-Encoding header.";
+		errorMessage = "Could not set Accept-Encoding header.";
 		goto fail;
 	}
 
@@ -201,15 +194,15 @@ void Downloader::process( void ) {
 		break;
 
 	case CURLE_ABORTED_BY_CALLBACK:
-		error = "User aborted.";
+		errorMessage = "User aborted.";
 		goto fail;
 
 	case CURLE_WRITE_ERROR:
-		error = "A write error occurred.";
+		errorMessage = "A write error occurred.";
 		goto fail;
 
 	default:
-		error = std::string( curlError );
+		errorMessage = std::string( curlError );
 		goto fail;
 	}
 
@@ -217,23 +210,20 @@ void Downloader::process( void ) {
 	goto cleanup;
 
 fail:
-	failed = true;
+	hasFailed = true;
 cleanup:
 	curl_slist_free_all( slist );
 	curl_easy_cleanup( curl );
 exit:
-	done = true;
+	isFinished = true;
 	return;
 }
 
-bool Downloader::isFinished( void ) {
-	return done && !joined;
-}
-
-void Downloader::join( void ) {
-	if (joined)
-		return;
-
+bool Downloader::assimilate( void ) {
+	if ((!isFinished && !wasTerminated) || threadHasJoined) {
+		return false;
+	}
 	thread.join( );
-	joined = true;
+	threadHasJoined = true;
+	return true;
 }
