@@ -192,7 +192,10 @@ class DownloadManager
 		@downloads       = { }
 		@failedDownloads = { }
 		if etagCacheDir
-			result, message  = sanitizeFile etagCacheDir\gsub( "[/\\]*$", "/", 1 ), true
+			result, message = sanitizeFile etagCacheDir\gsub( "[/\\]*$", "/", 1 ), true
+			-- Really don't like having an assertion here, but failing
+			-- silently is much worse, and failable constructors don't exist
+			-- in moonscript without throwing errors.
 			assert message == nil, message
 			@cache = ETagCache result
 
@@ -201,7 +204,9 @@ class DownloadManager
 
 		-- sha1 and etag types get (lazy) checked later.
 		urlType, outfileType = type( url ), type outfile
-		assert urlType == "string" and outfileType == "string", msgs.addMissingArgs\format urlType, outfileType
+		-- Don't use asserts.
+		if urlType != "string" or outfileType != "string"
+			return nil, msgs.addMissingArgs\format urlType, outfileType
 
 		outfile, msg = sanitizeFile outfile
 		if outfile == nil
@@ -286,10 +291,11 @@ class DownloadManager
 	-- Also make them fat arrow functions for calling consistency.
 	checkFileSHA1: ( filename, expected ) =>
 		filenameType, expectedType = type( filename ), type expected
-		assert filenameType == "string" and expectedType == "string", msgs.checkMissingArgs\format filenameType, expectedType
+		if filenameType != "string" or expectedType != "string"
+			return nil, msgs.checkMissingArgs\format filenameType, expectedType
 
 		result = DM.getFileSHA1 filename
-		if nil == result
+		if result == nil
 			return nil, "Could not open file #{filename}."
 		else
 			result = ffi.string result
@@ -301,9 +307,15 @@ class DownloadManager
 
 	checkStringSHA1: ( string, expected ) =>
 		stringType, expectedType = type( string ), type expected
-		assert stringType == "string" and expectedType == "string", msgs.checkMissingArgs\format stringType, expectedType
+		if stringType != "string" or expectedType != "string"
+			msgs.checkMissingArgs\format stringType, expectedType
 
-		result = ffi.string DM.getStringSHA1 string
+		result = DM.getStringSHA1 string
+		if result == nil
+			return nil, "Something has gone horribly wrong???"
+		else
+			result = ffi.string result
+
 		if result == expected\lower!
 			return true
 		else
