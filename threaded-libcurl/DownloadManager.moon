@@ -185,10 +185,10 @@ class DownloadManager
 	}
 
 	freeManager = ( manager ) ->
-		DM.freeDM manager
+		DM.CDlM_freeDM manager
 
 	new: ( etagCacheDir ) =>
-		@manager = ffi.gc DM.newDM!, freeManager
+		@manager = ffi.gc DM.CDlM_new!, freeManager
 		@downloads       = { }
 		@failedDownloads = { }
 		if etagCacheDir
@@ -224,7 +224,7 @@ class DownloadManager
 			-- if cached file does not exist, do not pass in an etag.
 			etag = nil
 
-		id = DM.addDownload @manager, url, outfile, sha1, etag
+		id = DM.CDlM_addDownload @manager, url, outfile, sha1, etag
 		if id == 0
 			return nil, "Could not add download for some reason."
 
@@ -235,24 +235,24 @@ class DownloadManager
 	progress: =>
 		return nil, msgs.notInitialized unless DM
 
-		math.floor 100 * DM.progress @manager
+		math.floor 100 * DM.CDlM_progress @manager
 
 	cancel: =>
 		return nil, msgs.notInitialized unless DM
 
-		DM.terminate @manager
+		DM.CDlM_terminate @manager
 
 	clear: =>
 		return nil, msgs.notInitialized unless DM
 
-		DM.clear @manager
+		DM.CDlM_clear @manager
 		@downloads = {}
 		@failedDownloads = {}
 
 	waitForFinish: ( callback ) =>
 		return nil, msgs.notInitialized unless DM
 
-		while 0 != DM.busy @manager
+		while 0 != DM.CDlM_busy @manager
 			if callback and not callback @progress!
 				return
 			sleep!
@@ -265,18 +265,18 @@ class DownloadManager
 		-- all downloads are finished at this point
 		for download in *@downloads
 
-			err = DM.getError @manager, download.id
+			err = DM.CDlM_getError @manager, download.id
 			if err != nil
 				pushFailed download, ffi.string err
 
 			if @cache
-				if DM.fileWasCached download.id
+				if DM.CDlM_fileWasCached download.id
 					err, msg = @cache\useCache download
 					if err == nil
 						pushFailed download, "Couldn't use cache. Message: " .. msg
 
 				else
-					newETag = DM.getETag download.id
+					newETag = DM.CDlM_getETag download.id
 					if newETag != nil
 						download.etag = ffi.string newETag
 						-- not technically an error if this fails
@@ -294,7 +294,7 @@ class DownloadManager
 		if filenameType != "string" or expectedType != "string"
 			return nil, msgs.checkMissingArgs\format filenameType, expectedType
 
-		result = DM.getFileSHA1 filename
+		result = DM.CDlM_getFileSHA1 filename
 		if result == nil
 			return nil, "Could not open file #{filename}."
 		else
@@ -310,7 +310,7 @@ class DownloadManager
 		if stringType != "string" or expectedType != "string"
 			msgs.checkMissingArgs\format stringType, expectedType
 
-		result = DM.getStringSHA1 string
+		result = DM.CDlM_getStringSHA1 string
 		if result == nil
 			return nil, "Something has gone horribly wrong???"
 		else
@@ -322,4 +322,4 @@ class DownloadManager
 			return false, "Hash mismatch. Got #{result}, expected #{expected}."
 
 	isInternetConnected: =>
-		return DM.isInternetConnected!
+		return DM.CDlM_isInternetConnected!

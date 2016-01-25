@@ -4,47 +4,47 @@
 
 // Avoid symbol mangling.
 extern "C" {
-	EXPORT CDlM *newDM( void ) {
+	EXPORT CDlM *CDlM_new( void ) {
 		return reinterpret_cast<CDlM*>(new DownloadManager);
 	}
 
-	EXPORT uint addDownload( CDlM *mgr, const char *url, const char *outputFile, const char *expectedHash, const char *expectedETag ) {
+	EXPORT uint CDlM_addDownload( CDlM *mgr, const char *url, const char *outputFile, const char *expectedHash, const char *expectedETag ) {
 		if (mgr == nullptr)
 			return 0;
 		return reinterpret_cast<DownloadManager*>(mgr)->addDownload( url, outputFile, expectedHash, expectedETag );
 	}
 
-	EXPORT double progress( CDlM *mgr ) {
+	EXPORT double CDlM_progress( CDlM *mgr ) {
 		if (mgr == nullptr)
 			return 0;
 		return reinterpret_cast<DownloadManager*>(mgr)->getProgress( );
 	}
 
-	EXPORT int busy( CDlM *mgr ) {
+	EXPORT int CDlM_busy( CDlM *mgr ) {
 		if (mgr == nullptr)
 			return 0;
 		return reinterpret_cast<DownloadManager*>(mgr)->busy( );
 	}
 
-	EXPORT int checkDownload( CDlM *mgr, uint i ) {
+	EXPORT int CDlM_checkDownload( CDlM *mgr, uint i ) {
 		if (mgr == nullptr)
 			return -1;
 		return reinterpret_cast<DownloadManager*>(mgr)->checkDownload( i );
 	}
 
-	EXPORT const char* getError( CDlM *mgr, uint i ) {
+	EXPORT const char* CDlM_getError( CDlM *mgr, uint i ) {
 		if (mgr == nullptr)
 			return nullptr;
 		return reinterpret_cast<DownloadManager*>(mgr)->getError( i );
 	}
 
-	EXPORT bool fileWasCached( CDlM *mgr, uint i ) {
+	EXPORT bool CDlM_fileWasCached( CDlM *mgr, uint i ) {
 		if (mgr == nullptr)
 			return false;
 		return reinterpret_cast<DownloadManager*>(mgr)->fileWasCached( i );
 	}
 
-	EXPORT const char* getETag( CDlM *mgr, uint i ) {
+	EXPORT const char* CDlM_getETag( CDlM *mgr, uint i ) {
 		if (mgr == nullptr)
 			return nullptr;
 		auto result = reinterpret_cast<DownloadManager*>(mgr)->getETag( i );
@@ -53,19 +53,19 @@ extern "C" {
 		return result;
 	}
 
-	EXPORT void terminate( CDlM *mgr ) {
+	EXPORT void CDlM_terminate( CDlM *mgr ) {
 		if (mgr == nullptr)
 			return;
 		reinterpret_cast<DownloadManager*>(mgr)->terminate( );
 	}
 
-	EXPORT void clear( CDlM *mgr ) {
+	EXPORT void CDlM_clear( CDlM *mgr ) {
 		if (mgr == nullptr)
 			return;
 		reinterpret_cast<DownloadManager*>(mgr)->clear( );
 	}
 
-	EXPORT const char* getFileSHA1( const char *filename ) {
+	EXPORT const char* CDlM_getFileSHA1( const char *filename ) {
 		if (filename == nullptr)
 			return nullptr;
 
@@ -76,7 +76,7 @@ extern "C" {
 		return result.c_str( );
 	}
 
-	EXPORT const char* getStringSHA1( const char *string ) {
+	EXPORT const char* CDlM_getStringSHA1( const char *string ) {
 		if (string == nullptr)
 			return nullptr;
 
@@ -87,18 +87,18 @@ extern "C" {
 		return result.c_str( );
 	}
 
-	EXPORT uint version( void ) {
+	EXPORT uint CDlM_version( void ) {
 		return DownloadManager::version;
 	}
 
-	EXPORT void freeDM( CDlM* mgr ) {
+	EXPORT void CDlM_freeDM( CDlM* mgr ) {
 		if (mgr == nullptr)
 			return;
 
 		delete reinterpret_cast<DownloadManager*>(mgr);
 	}
 
-	EXPORT bool isInternetConnected() {
+	EXPORT bool CDlM_isInternetConnected() {
 		return DownloadManager::isInternetConnected();
 	}
 }

@@ -17,23 +17,23 @@ struct CDlM;
 typedef struct CDlM CDlM;
 typedef unsigned int uint;
 
-EXPORT CDlM*       newDM         ( void );
-EXPORT uint        addDownload   ( CDlM *mgr,              const char *url,
+EXPORT CDlM*       CDlM_new           ( void );
+EXPORT uint        CDlM_addDownload   ( CDlM *mgr,              const char *url,
                                    const char *outputFile, const char *expectedHash,
                                    const char *expectedETag );
-EXPORT double      progress      ( CDlM *mgr );
-EXPORT int         busy          ( CDlM *mgr );
-EXPORT int         checkDownload ( CDlM *mgr, uint i );
-EXPORT const char* getError      ( CDlM *mgr, uint i );
-EXPORT bool        fileWasCached ( CDlM *mgr, uint i );
-EXPORT const char* getETag       ( CDlM *mgr, uint i );
-EXPORT void        terminate     ( CDlM *mgr );
-EXPORT void        clear         ( CDlM *mgr );
-EXPORT const char* getFileSHA1   ( const char *filename );
-EXPORT const char* getStringSHA1 ( const char *string );
-EXPORT uint        version       ( void );
-EXPORT void        freeDM        ( CDlM *mgr );
-EXPORT bool        isInternetConnected( void );
+EXPORT double      CDlM_progress      ( CDlM *mgr );
+EXPORT int         CDlM_busy          ( CDlM *mgr );
+EXPORT int         CDlM_checkDownload ( CDlM *mgr, uint i );
+EXPORT const char* CDlM_getError      ( CDlM *mgr, uint i );
+EXPORT bool        CDlM_fileWasCached ( CDlM *mgr, uint i );
+EXPORT const char* CDlM_getETag       ( CDlM *mgr, uint i );
+EXPORT void        CDlM_terminate     ( CDlM *mgr );
+EXPORT void        CDlM_clear         ( CDlM *mgr );
+EXPORT const char* CDlM_getFileSHA1   ( const char *filename );
+EXPORT const char* CDlM_getStringSHA1 ( const char *string );
+EXPORT uint        CDlM_version       ( void );
+EXPORT void        CDlM_freeDM        ( CDlM *mgr );
+EXPORT bool        CDlM_isInternetConnected( void );
 #ifdef __cplusplus
 }
 #endif
