@@ -69,7 +69,7 @@ void Sleep(unsigned long);
 
 DMVersion = 0x000400
 DM, loadedLibraryPath = requireffi "DM.DownloadManager.DownloadManager"
-libVer = DM.version!
+libVer = DM.CDlM_version!
 if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/65536%256)
 	error "Library version mismatch. Wanted #{DMVersion}, got #{libVer}."
 
@@ -270,13 +270,13 @@ class DownloadManager
 				pushFailed download, ffi.string err
 
 			if @cache
-				if DM.CDlM_fileWasCached download.id
+				if DM.CDlM_fileWasCached @manager, download.id
 					err, msg = @cache\useCache download
 					if err == nil
 						pushFailed download, "Couldn't use cache. Message: " .. msg
 
 				else
-					newETag = DM.CDlM_getETag download.id
+					newETag = DM.CDlM_getETag @manager, download.id
 					if newETag != nil
 						download.etag = ffi.string newETag
 						-- not technically an error if this fails
