@@ -45,7 +45,7 @@
 						},
 						{
 							"name": "/libBadMutex.dylib",
-							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
+							"url": "@{fileBaseUrl}@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
 							"sha1": "3BD86DC82991C0002ED8C13972D27D247A1BA38B"
 						}
@@ -56,7 +56,7 @@
 						},
 						{
 							"moduleName": "requireffi.requireffi",
-							"version": "0.1.0",
+							"version": "0.1.2",
 							"feed": "@{feed:this}"
 						}
 					]
@@ -99,7 +99,7 @@
 						},
 						{
 							"name": "/libPreciseTimer.dylib",
-							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
+							"url": "@{fileBaseUrl}@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
 							"sha1": "9E8CCA0406003883C025A5AD156625D6EEFD0171"
 						}
@@ -110,7 +110,7 @@
 						},
 						{
 							"moduleName": "requireffi.requireffi",
-							"version": "0.1.0",
+							"version": "0.1.2",
 							"feed": "@{feed:this}"
 						}
 					]
@@ -124,8 +124,8 @@
 			"description": "Nonblocking downloads with libcurl.",
 			"channels": {
 				"release": {
-					"version": "0.3.1",
-					"released": "2015-05-01",
+					"version": "0.4.0",
+					"released": "2016-01-27",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
 					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
@@ -133,7 +133,7 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "6F295C9E533B34015B3DFADFA5B8835DA3E9311D"
+							"sha1": "EAB25F3789E286F4F7F9607D67D424D6519D835B"
 						},
 						{
 							"name": ".dll",
@@ -143,19 +143,19 @@
 							"name": "/DownloadManager.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win32.dll",
 							"platform": "Windows-x86",
-							"sha1": "0F77B5CACC5281558AD6CBF51763B17862CD984C"
+							"sha1": "BE4B6D559312A0EE23216FFBCF45160737A6A757"
 						},
 						{
 							"name": "/DownloadManager.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win64.dll",
 							"platform": "Windows-x64",
-							"sha1": "E9CE4D1901A66241E3F8D20098258DB4F340DEF0"
+							"sha1": "8540C49CF0AE81085034154AAA6A089E05DF419E"
 						},
 						{
 							"name": "/libDownloadManager.dylib",
-							"url": "@{fileBaseUrl}lib@{scriptName}-osx64.dylib",
+							"url": "@{fileBaseUrl}@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "127B17E6E4A84647AB5B1F03E8CA16935AC33D89"
+							"sha1": "3D7B3A448851343CDDF160449C4DA6840AA2A4C7"
 						}
 					],
 					"requiredModules": [
@@ -164,7 +164,7 @@
 						},
 						{
 							"moduleName": "requireffi.requireffi",
-							"version": "0.1.0",
+							"version": "0.1.2",
 							"feed": "@{feed:this}"
 						}
 					]
@@ -178,15 +178,15 @@
 			"description": "Load C libraries with ease.",
 			"channels": {
 				"release": {
-					"version": "0.1.1",
-					"released": "2015-05-01",
+					"version": "0.1.2",
+					"released": "2016-01-22",
 					"default": true,
 					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "AA4CACF574DAC8A59888EA418487AFD12CABE3F9"
+							"sha1": "FFAC47D0E85AB578ED44B024FA84574CF3928630"
 						}
 					],
 					"requiredModules": [

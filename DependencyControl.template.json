@@ -125,7 +125,7 @@
 			"channels": {
 				"release": {
 					"version": "0.4.0",
-					"released": "2015-05-01",
+					"released": "2016-01-27",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
 					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
