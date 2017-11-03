@@ -1,13 +1,15 @@
 #pragma once
 #include <chrono>
+#include <type_traits>
+
+typedef std::conditional<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>::type UsefulClock;
 
 class PreciseTimer {
-	private:
-		std::chrono::high_resolution_clock::time_point startTime;
-		std::chrono::high_resolution_clock::time_point endTime;
-		std::chrono::duration<double> timeSpan;
+	protected:
+		UsefulClock::time_point startTime;
 	public:
-		const static unsigned int version = 0x000100;
-		PreciseTimer( void );
-		double getElapsedTime( void );
+		static constexpr unsigned int version = 0x000101;
+
+		PreciseTimer( );
+		double getElapsedTime( );
 };
