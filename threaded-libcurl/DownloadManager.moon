@@ -182,7 +182,12 @@ class DownloadManager
 		getMissingArg: "Required argument (filename) was either absent or the wrong type. Expected string, got '%s'.",
 		checkMissingArgs: "Required arguments #1 (filename/string) and #2 (expected) or the wrong type. Expected string, got '%s' and '%s'.",
 		outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
-		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s."
+		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s.",
+		failedToOpen: "Could not open file %s.",
+		hashMismatch: "Hash mismatch. Got %s, expected %s.",
+		horriblyWrong: "Something has gone horribly wrong???",
+		cacheFailure: "Couldn't use cache. Message: %s",
+		failedToAdd: "Could not add download for some reason."
 	}
 
 	freeManager = ( manager ) ->
@@ -227,7 +232,7 @@ class DownloadManager
 
 		id = DM.CDlM_addDownload @manager, url, outfile, sha1, etag
 		if id == 0
-			return nil, "Could not add download for some reason."
+			return nil, msgs.failedToAdd
 
 		download = { :id, :url, :outfile, :sha1, :etag }
 		table.insert @downloads, download
@@ -274,7 +279,7 @@ class DownloadManager
 				if DM.CDlM_fileWasCached @manager, download.id
 					err, msg = @cache\useCache download
 					if err == nil
-						pushFailed download, "Couldn't use cache. Message: " .. msg
+						pushFailed download, msgs.cacheFailure\format msg
 
 				else
 					newETag = DM.CDlM_getETag @manager, download.id
@@ -297,7 +302,7 @@ class DownloadManager
 
 		result = DM.CDlM_getFileSHA1 filename
 		if result == nil
-			return nil, "Could not open file #{filename}."
+			return nil, msgs.failedToOpen\format filename
 		else
 			result = ffi.string result
 
@@ -314,7 +319,7 @@ class DownloadManager
 		elseif result == expected\lower!
 			return true
 		else
-			return false, "Hash mismatch. Got #{result}, expected #{expected}."
+			return false, msgs.hashMismatch\format result, expected
 
 	checkStringSHA1: ( string, expected ) =>
 		stringType, expectedType = type( string ), type expected
@@ -323,14 +328,14 @@ class DownloadManager
 
 		result = DM.CDlM_getStringSHA1 string
 		if result == nil
-			return nil, "Something has gone horribly wrong???"
+			return nil, msgs.horriblyWrong
 		else
 			result = ffi.string result
 
 		if result == expected\lower!
 			return true
 		else
-			return false, "Hash mismatch. Got #{result}, expected #{expected}."
+			return false, msgs.hashMismatch\format result, expected
 
 	isInternetConnected: =>
 		return DM.CDlM_isInternetConnected!
