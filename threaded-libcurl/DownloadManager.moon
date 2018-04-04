@@ -179,6 +179,7 @@ class DownloadManager
 	msgs = {
 		notInitialized: "#{@__name} not initialized.",
 		addMissingArgs: "Required arguments #1 (url) or #2 (outfile) had the wrong type. Expected string, got '%s' and '%s'.",
+		getMissingArg: "Required argument (filename) was either absent or the wrong type. Expected string, got '%s'.",
 		checkMissingArgs: "Required arguments #1 (filename/string) and #2 (expected) or the wrong type. Expected string, got '%s' and '%s'.",
 		outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
 		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s."
@@ -289,10 +290,10 @@ class DownloadManager
 	-- since DM has to be initialized for them to work, it's easier to
 	-- just make them instance methods than trying to juggle the DM init.
 	-- Also make them fat arrow functions for calling consistency.
-	checkFileSHA1: ( filename, expected ) =>
-		filenameType, expectedType = type( filename ), type expected
-		if filenameType != "string" or expectedType != "string"
-			return nil, msgs.checkMissingArgs\format filenameType, expectedType
+	getFileSHA1: ( filename ) =>
+		filenameType = type filename
+		if filenameType != "string"
+			return nil, msgs.getMissingArg\format stringType
 
 		result = DM.CDlM_getFileSHA1 filename
 		if result == nil
@@ -300,7 +301,17 @@ class DownloadManager
 		else
 			result = ffi.string result
 
-		if result == expected\lower!
+		return result
+
+	checkFileSHA1: ( filename, expected ) =>
+		filenameType, expectedType = type( filename ), type expected
+		if filenameType != "string" or expectedType != "string"
+			return nil, msgs.checkMissingArgs\format filenameType, expectedType
+
+		result, msg = getFileSHA1 filename
+		if result == nil
+			return result, msg
+		elseif result == expected\lower!
 			return true
 		else
 			return false, "Hash mismatch. Got #{result}, expected #{expected}."
