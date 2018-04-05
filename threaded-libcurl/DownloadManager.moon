@@ -176,8 +176,8 @@ class ETagCache
 		return true
 
 class DownloadManager
-	@version = 0x000400
-	@version_string = "0.4.0"
+	@version = 0x000500
+	@version_string = "0.5.0"
 	@__depCtrlInit = ( DependencyControl ) ->
 		@version = DependencyControl {
 			name: "#{@__name}",

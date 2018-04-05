@@ -14,8 +14,8 @@ if libVer < PTVersion or math.floor(libVer/65536%256) > math.floor(PTVersion/655
 	error "Library version mismatch. Wanted #{PTVersion}, got #{libVer}."
 
 class PreciseTimer
-	@version = 0x000105
-	@version_string = "0.1.5"
+	@version = 0x000106
+	@version_string = "0.1.6"
 	@__depCtrlInit = ( DependencyControl ) ->
 		@version = DependencyControl {
 			name: "#{@__name}",
