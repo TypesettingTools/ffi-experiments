@@ -75,6 +75,20 @@ if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/655
 
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
+msgs = {
+	notInitialized: "#{@__name} not initialized.",
+	addMissingArgs: "Required arguments #1 (url) or #2 (outfile) had the wrong type. Expected string, got '%s' and '%s'.",
+	getMissingArg: "Required argument (filename) was either absent or the wrong type. Expected string, got '%s'.",
+	checkMissingArgs: "Required arguments #1 (filename/string) and #2 (expected) or the wrong type. Expected string, got '%s' and '%s'.",
+	outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
+	outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s.",
+	failedToOpen: "Could not open file %s.",
+	hashMismatch: "Hash mismatch. Got %s, expected %s.",
+	horriblyWrong: "Something has gone horribly wrong???",
+	cacheFailure: "Couldn't use cache. Message: %s",
+	failedToAdd: "Could not add download for some reason."
+}
+
 sanitizeFile = ( filename, acceptDir ) ->
 	-- expand leading ~.
 	if homeDir = os.getenv "HOME"
@@ -175,20 +189,6 @@ class DownloadManager
 			feed: "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
 		}
 	:loadedLibraryPath
-
-	msgs = {
-		notInitialized: "#{@__name} not initialized.",
-		addMissingArgs: "Required arguments #1 (url) or #2 (outfile) had the wrong type. Expected string, got '%s' and '%s'.",
-		getMissingArg: "Required argument (filename) was either absent or the wrong type. Expected string, got '%s'.",
-		checkMissingArgs: "Required arguments #1 (filename/string) and #2 (expected) or the wrong type. Expected string, got '%s' and '%s'.",
-		outNoFullPath: "Argument #2 (outfile) must contain a full path (relative paths not supported), got %s.",
-		outNoFile: "Argument #2 (outfile) must contain a full path with file name, got %s.",
-		failedToOpen: "Could not open file %s.",
-		hashMismatch: "Hash mismatch. Got %s, expected %s.",
-		horriblyWrong: "Something has gone horribly wrong???",
-		cacheFailure: "Couldn't use cache. Message: %s",
-		failedToAdd: "Could not add download for some reason."
-	}
 
 	freeManager = ( manager ) ->
 		DM.CDlM_freeDM manager
@@ -298,7 +298,7 @@ class DownloadManager
 	getFileSHA1: ( filename ) =>
 		filenameType = type filename
 		if filenameType != "string"
-			return nil, msgs.getMissingArg\format stringType
+			return nil, msgs.getMissingArg\format filenameType
 
 		result = DM.CDlM_getFileSHA1 filename
 		if result == nil
@@ -313,7 +313,7 @@ class DownloadManager
 		if filenameType != "string" or expectedType != "string"
 			return nil, msgs.checkMissingArgs\format filenameType, expectedType
 
-		result, msg = getFileSHA1 filename
+		result, msg = @getFileSHA1 filename
 		if result == nil
 			return result, msg
 		elseif result == expected\lower!
