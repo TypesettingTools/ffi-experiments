@@ -70,8 +70,8 @@
 			"description": "A precise timer.",
 			"channels": {
 				"release": {
-					"version": "0.1.5",
-					"released": "2015-05-01",
+					"version": "0.1.6",
+					"released": "2018-04-05",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
 					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
@@ -124,8 +124,8 @@
 			"description": "Nonblocking downloads with libcurl.",
 			"channels": {
 				"release": {
-					"version": "0.4.0",
-					"released": "2016-01-27",
+					"version": "0.5.0",
+					"released": "2018-04-05",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
 					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
