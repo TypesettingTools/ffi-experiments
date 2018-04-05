@@ -2,7 +2,7 @@
 	"dependencyControlFeedFormatVersion": "0.2.0",
 	"name": "FFI Experiments",
 	"description": "Experiments combining C++ with luajit FFI",
-	"baseUrl": "https://github.com/torque/ffi-experiments",
+	"baseUrl": "https://github.com/TypesettingTools/ffi-experiments",
 	"url": "@{baseUrl}",
 	"maintainer": "torque",
 	"knownFeeds": {
@@ -20,7 +20,7 @@
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
@@ -74,7 +74,7 @@
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
@@ -128,7 +128,7 @@
 					"released": "2016-01-27",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
@@ -181,7 +181,7 @@
 					"version": "0.1.2",
 					"released": "2016-01-22",
 					"default": true,
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
