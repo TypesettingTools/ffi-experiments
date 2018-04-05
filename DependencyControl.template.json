@@ -6,7 +6,7 @@
 	"url": "@{baseUrl}",
 	"maintainer": "torque",
 	"knownFeeds": {
-		"this": "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json"
+		"this": "https://raw.githubusercontent.com/TypesettingTools/ffi-experiments/master/DependencyControl.json"
 	},
 	"modules": {
 		"BM.BadMutex": {

@@ -28,9 +28,9 @@ BadMutex = {
 			version: BadMutex.version,
 			description: "A global mutex.",
 			author: "torque",
-			url: "https://github.com/torque/ffi-experiments",
+			url: "https://github.com/TypesettingTools/ffi-experiments",
 			moduleName: "BM.BadMutex",
-			feed: "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
+			feed: "https://raw.githubusercontent.com/TypesettingTools/ffi-experiments/master/DependencyControl.json",
 		}
 	:loadedLibraryPath
 }

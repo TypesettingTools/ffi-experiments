@@ -63,9 +63,9 @@ versionRecord = {
 			version: version,
 			description: "FFI.load wrapper for loading C modules.",
 			author: "torque",
-			url: "https://github.com/torque/ffi-experiments",
+			url: "https://github.com/TypesettingTools/ffi-experiments",
 			moduleName: "requireffi.requireffi",
-			feed: "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json",
+			feed: "https://raw.githubusercontent.com/TypesettingTools/ffi-experiments/master/DependencyControl.json",
 		}
 }
 return setmetatable versionRecord, { __call: requireffi }
