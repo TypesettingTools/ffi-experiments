@@ -2,11 +2,11 @@
 	"dependencyControlFeedFormatVersion": "0.2.0",
 	"name": "FFI Experiments",
 	"description": "Experiments combining C++ with luajit FFI",
-	"baseUrl": "https://github.com/torque/ffi-experiments",
+	"baseUrl": "https://github.com/TypesettingTools/ffi-experiments",
 	"url": "@{baseUrl}",
 	"maintainer": "torque",
 	"knownFeeds": {
-		"this": "https://raw.githubusercontent.com/torque/ffi-experiments/master/DependencyControl.json"
+		"this": "https://raw.githubusercontent.com/TypesettingTools/ffi-experiments/master/DependencyControl.json"
 	},
 	"modules": {
 		"BM.BadMutex": {
@@ -20,12 +20,12 @@
 					"released": "2015-05-01",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "5654B9E7F89DDD3CFBBA2310A1B8F4CDB8CA571A"
+							"sha1": "351D94BCF03F4640C589A7BA9683DBF5CC6D749C"
 						},
 						{
 							"name": ".dll",
@@ -47,7 +47,7 @@
 							"name": "/libBadMutex.dylib",
 							"url": "@{fileBaseUrl}@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "3BD86DC82991C0002ED8C13972D27D247A1BA38B"
+							"sha1": "941E122E7A2E0BCCCFEB38CC87F4A2DD92838C2D"
 						}
 					],
 					"requiredModules": [
@@ -70,16 +70,16 @@
 			"description": "A precise timer.",
 			"channels": {
 				"release": {
-					"version": "0.1.5",
-					"released": "2015-05-01",
+					"version": "0.1.6",
+					"released": "2018-04-05",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "9016C1CFBBAC91950E43A76670B106184806EB26"
+							"sha1": "C4ABF9A8BCF8DC4DFEEFEE1EC00172846BADC52A"
 						},
 						{
 							"name": ".dll",
@@ -89,19 +89,19 @@
 							"name": "/PreciseTimer.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win32.dll",
 							"platform": "Windows-x86",
-							"sha1": "87E540F679D1A43954E4F436CD514FC7AF5BD682"
+							"sha1": "8629E147DEC486D2190140C04F0B0C5465B764E9"
 						},
 						{
 							"name": "/PreciseTimer.dll",
 							"url": "@{fileBaseUrl}@{scriptName}-win64.dll",
 							"platform": "Windows-x64",
-							"sha1": "5E9182EF279C7C40B549769D029861DFCF8720C3"
+							"sha1": "17FBBDC997CFF596FC55260B684126DCCF45EFDC"
 						},
 						{
 							"name": "/libPreciseTimer.dylib",
 							"url": "@{fileBaseUrl}@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "9E8CCA0406003883C025A5AD156625D6EEFD0171"
+							"sha1": "602ECB3EB2783BD490A6FA8D4AB3FCD15F213FEF"
 						}
 					],
 					"requiredModules": [
@@ -124,16 +124,16 @@
 			"description": "Nonblocking downloads with libcurl.",
 			"channels": {
 				"release": {
-					"version": "0.4.0",
-					"released": "2016-01-27",
+					"version": "0.5.0",
+					"released": "2018-04-05",
 					"default": true,
 					"platforms": ["Windows-x86", "Windows-x64", "OSX-x64"],
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "EAB25F3789E286F4F7F9607D67D424D6519D835B"
+							"sha1": "A699B79F96BE7F123947E26E7D31C5A9A74174C5"
 						},
 						{
 							"name": ".dll",
@@ -155,7 +155,7 @@
 							"name": "/libDownloadManager.dylib",
 							"url": "@{fileBaseUrl}@{scriptName}-osx64.dylib",
 							"platform": "OSX-x64",
-							"sha1": "3D7B3A448851343CDDF160449C4DA6840AA2A4C7"
+							"sha1": "364050E938726F79DF7C1EB9C29B8219B06572A7"
 						}
 					],
 					"requiredModules": [
@@ -181,12 +181,12 @@
 					"version": "0.1.2",
 					"released": "2016-01-22",
 					"default": true,
-					"fileBaseUrl": "https://github.com/torque/ffi-experiments/releases/download/r3/",
+					"fileBaseUrl": "https://github.com/TypesettingTools/ffi-experiments/releases/download/r3/",
 					"files": [
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "FFAC47D0E85AB578ED44B024FA84574CF3928630"
+							"sha1": "BCE2865755C90BB48FC49F93C9EAF2DB9DE29095"
 						}
 					],
 					"requiredModules": [
