@@ -76,7 +76,7 @@ if libVer < DMVersion or math.floor(libVer/65536%256) > math.floor(DMVersion/655
 sleep = ffi.os == "Windows" and (( ms = 100 ) -> ffi.C.Sleep ms) or (( ms = 100 ) -> ffi.C.usleep ms*1000)
 
 msgs = {
-	notInitialized: "#{@__name} not initialized.",
+	notInitialized: "%s not initialized.",
 	addMissingArgs: "Required arguments #1 (url) or #2 (outfile) had the wrong type. Expected string, got '%s' and '%s'.",
 	getMissingArg: "Required argument (filename) was either absent or the wrong type. Expected string, got '%s'.",
 	checkMissingArgs: "Required arguments #1 (filename/string) and #2 (expected) or the wrong type. Expected string, got '%s' and '%s'.",
@@ -206,7 +206,7 @@ class DownloadManager
 			@cache = ETagCache result
 
 	addDownload: ( url, outfile, sha1, etag ) =>
-		return nil, msgs.notInitialized unless DM
+		return nil, msgs.notInitialized\format @__name unless DM
 
 		-- sha1 and etag types get (lazy) checked later.
 		urlType, outfileType = type( url ), type outfile
@@ -239,24 +239,24 @@ class DownloadManager
 		return download
 
 	progress: =>
-		return nil, msgs.notInitialized unless DM
+		return nil, msgs.notInitialized\format @__name unless DM
 
 		math.floor 100 * DM.CDlM_progress @manager
 
 	cancel: =>
-		return nil, msgs.notInitialized unless DM
+		return nil, msgs.notInitialized\format @__name unless DM
 
 		DM.CDlM_terminate @manager
 
 	clear: =>
-		return nil, msgs.notInitialized unless DM
+		return nil, msgs.notInitialized\format @__name unless DM
 
 		DM.CDlM_clear @manager
 		@downloads = {}
 		@failedDownloads = {}
 
 	waitForFinish: ( callback ) =>
-		return nil, msgs.notInitialized unless DM
+		return nil, msgs.notInitialized\format @__name unless DM
 
 		while 0 != DM.CDlM_busy @manager
 			if callback and not callback @progress!
