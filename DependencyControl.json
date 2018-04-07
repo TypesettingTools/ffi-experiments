@@ -133,7 +133,7 @@
 						{
 							"name": ".lua",
 							"url": "@{fileBaseUrl}@{scriptName}.lua",
-							"sha1": "A699B79F96BE7F123947E26E7D31C5A9A74174C5"
+							"sha1": "E4785E4ACAD637905ACF2B83F687FF9465784669"
 						},
 						{
 							"name": ".dll",
