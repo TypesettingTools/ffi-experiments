@@ -39,6 +39,23 @@ if host_machine.system() == 'linux'
     deps += dependency('threads', static: static_deps)
 endif
 
+lua_builder = find_program('BuildLua.sh')
+
 subdir('bad-mutex')
 subdir('precise-timer')
-subdir('threaded-libcurl')
+subdir('download-manager')
+subdir('requireffi')
+
+if host_machine.system() != 'windows'
+    # meson is garbage and run_target appears to be the only way to
+    # actually add a new compilation target to ninja.
+    run_target('lua',
+        command: find_program('true'),
+        depends: [
+            bad_mutex_lua,
+            download_manager_lua,
+            precise_timer_lua,
+            requireffi_lua
+        ]
+    )
+endif
