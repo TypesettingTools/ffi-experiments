@@ -1,0 +1,2 @@
+option('static_deps', type: 'boolean', value: false, description: 'Statically link dependencies')
+option('libcurl_path', type: 'string', description: 'Path to a statically built libcurl')
