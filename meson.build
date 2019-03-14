@@ -1,7 +1,7 @@
 project('ffi-experiments', 'c', 'cpp',
     license: 'ISC',
-    meson_version: '>=0.41.0',
-    default_options: ['c_std=c99', 'cpp_std=c++11']
+    meson_version: '>=0.45.0',
+    default_options: ['c_std=c99', 'cpp_std=c++14', 'buildtype=release', 'b_ndebug=if-release']
 )
 
 cc = meson.get_compiler('c')

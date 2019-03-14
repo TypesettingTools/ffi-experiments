@@ -32,7 +32,7 @@ You will need:
 Building on OSX and Linux should be as simple as running the following:
 ```
 cd /path/to/ffi-experiments
-meson build --buildtype=release
+meson build
 cd build
 ninja
 ```
@@ -55,7 +55,9 @@ following:
 ```
 powershell
 cd C:\Path\To\ffi-experiments
-meson -Dlibcurl_path="C:\Path\To\libcurl" build --backend=vs --buildtype=release
+meson -Dlibcurl_path="C:\Path\To\libcurl" build
+cd build
+ninja
 ```
 
 You can then launch the solution, pick a god and pray, and then attempt
