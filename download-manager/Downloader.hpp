@@ -5,7 +5,7 @@
 
 #include "sha1.h"
 
-std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] );
+std::string digestToHex( uint8_t digest[DM_SHA1_DIGEST_SIZE] );
 
 class Downloader {
 	std::thread thread;
@@ -14,7 +14,7 @@ class Downloader {
 	            expectedETag,
 	            expectedHash,
 	            outputBuffer;
-	SHA1_CTX sha1ctx;
+	DM_SHA1_CTX sha1ctx;
 	// because std::string isn't an optional type, we'll manually track
 	// whether or not the optional constructor arguments exist.
 	bool hasExpectedHash = false,

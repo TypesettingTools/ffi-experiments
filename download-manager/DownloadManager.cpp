@@ -125,11 +125,11 @@ std::string DownloadManager::getFileSHA1( const std::string &filename ) {
 }
 
 std::string DownloadManager::getStringSHA1( const std::string &string ) {
-	SHA1_CTX ctx;
-	uint8_t digest[SHA1_DIGEST_SIZE];
-	SHA1_Init( &ctx );
-	SHA1_Update( &ctx, reinterpret_cast<const uint8_t*>(string.c_str( )), string.size( ) );
-	SHA1_Final( &ctx, digest );
+	DM_SHA1_CTX ctx;
+	uint8_t digest[DM_SHA1_DIGEST_SIZE];
+	DM_SHA1_Init( &ctx );
+	DM_SHA1_Update( &ctx, reinterpret_cast<const uint8_t*>(string.c_str( )), string.size( ) );
+	DM_SHA1_Final( &ctx, digest );
 	return digestToHex( digest );
 }
 

@@ -21,9 +21,9 @@ static size_t curlHeaderCallback( char *buffer, size_t size, size_t nitems, void
 	return static_cast<Downloader*>(userdata)->headerCallback( buffer, size*nitems );
 }
 
-std::string digestToHex( uint8_t digest[SHA1_DIGEST_SIZE] ) {
+std::string digestToHex( uint8_t digest[DM_SHA1_DIGEST_SIZE] ) {
 	char hash[41];
-	for( unsigned int offset = 0; offset < SHA1_DIGEST_SIZE; offset++ ) {
+	for( unsigned int offset = 0; offset < DM_SHA1_DIGEST_SIZE; offset++ ) {
 		snprintf( hash + 2*offset, 3, "%02x", digest[offset] );
 	}
 	DEBUG_LOG( "Calculated download sha1sum: " << std::string(hash) );
@@ -36,7 +36,7 @@ Downloader::Downloader( const char *url, const char *outputFile, const char *exp
 	if ( expectedHash != nullptr ) {
 		this->expectedHash = std::string( expectedHash );
 		hasExpectedHash = true;
-		SHA1_Init( &sha1ctx );
+		DM_SHA1_Init( &sha1ctx );
 	}
 	if ( expectedETag != nullptr ) {
 		this->expectedETag = std::string( expectedETag );
@@ -57,9 +57,9 @@ size_t Downloader::writeCallback( const char *buffer, size_t size ) {
 	if (hasExpectedHash) {
 		// This seems to calculate the sha1 correctly but buffer gets
 		// corrupted somehow. Is it the cast? Is it the function?
-		// SHA1_Update just memcpy's from the buffer, so it shouldn't be to
+		// DM_SHA1_Update just memcpy's from the buffer, so it shouldn't be to
 		// blame. Easiest fix is to append before hashing.
-		SHA1_Update( &sha1ctx, reinterpret_cast<const uint8_t*>(buffer), size );
+		DM_SHA1_Update( &sha1ctx, reinterpret_cast<const uint8_t*>(buffer), size );
 	}
 	return size;
 }
@@ -94,8 +94,8 @@ void Downloader::finalize( void ) {
 		return;
 
 	if (hasExpectedHash) {
-		uint8_t digest[SHA1_DIGEST_SIZE];
-		SHA1_Final( &sha1ctx, digest );
+		uint8_t digest[DM_SHA1_DIGEST_SIZE];
+		DM_SHA1_Final( &sha1ctx, digest );
 		DEBUG_LOG( "Finalizer sha1sum: " << expectedHash );
 		auto result = digestToHex( digest );
 		if ( result != expectedHash ) {

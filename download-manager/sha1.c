@@ -8,7 +8,7 @@ SHA-1 in C by Steve Reid
 
 #include "sha1.h"
 
-void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
+void DM_SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
@@ -29,7 +29,7 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
 #define R4(v,w,x,y,z,i) z+=(w^x^y)+blk(i)+0xCA62C1D6+rol(v,5);w=rol(w,30);
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
-void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64])
+void DM_SHA1_Transform(uint32_t state[5], const uint8_t buffer[64])
 {
     uint32_t a, b, c, d, e;
     typedef union {
@@ -79,7 +79,7 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64])
 }
 
 /* SHA1Init - Initialize new context */
-void SHA1_Init(SHA1_CTX* context)
+void DM_SHA1_Init(DM_SHA1_CTX* context)
 {
     /* SHA1 initialization constants */
     context->state[0] = 0x67452301;
@@ -91,7 +91,7 @@ void SHA1_Init(SHA1_CTX* context)
 }
 
 /* Run your data through this. */
-void SHA1_Update(SHA1_CTX* context, const uint8_t* data, const size_t len)
+void DM_SHA1_Update(DM_SHA1_CTX* context, const uint8_t* data, const size_t len)
 {
     size_t i, j;
 
@@ -100,9 +100,9 @@ void SHA1_Update(SHA1_CTX* context, const uint8_t* data, const size_t len)
     context->count[1] += (len >> 29);
     if ((j + len) > 63) {
         memcpy(&context->buffer[j], data, (i = 64-j));
-        SHA1_Transform(context->state, context->buffer);
+        DM_SHA1_Transform(context->state, context->buffer);
         for ( ; i + 63 < len; i += 64) {
-            SHA1_Transform(context->state, data + i);
+            DM_SHA1_Transform(context->state, data + i);
         }
         j = 0;
     }
@@ -111,7 +111,7 @@ void SHA1_Update(SHA1_CTX* context, const uint8_t* data, const size_t len)
 }
 
 /* Add padding and return the message digest. */
-void SHA1_Final(SHA1_CTX* context, uint8_t digest[SHA1_DIGEST_SIZE])
+void DM_SHA1_Final(DM_SHA1_CTX* context, uint8_t digest[DM_SHA1_DIGEST_SIZE])
 {
     uint32_t i;
     uint8_t  finalcount[8];
@@ -120,12 +120,12 @@ void SHA1_Final(SHA1_CTX* context, uint8_t digest[SHA1_DIGEST_SIZE])
         finalcount[i] = (unsigned char)((context->count[(i >= 4 ? 0 : 1)]
          >> ((3-(i & 3)) * 8) ) & 255);  /* Endian independent */
     }
-    SHA1_Update(context, (uint8_t *)"\200", 1);
+    DM_SHA1_Update(context, (uint8_t *)"\200", 1);
     while ((context->count[0] & 504) != 448) {
-        SHA1_Update(context, (uint8_t *)"\0", 1);
+        DM_SHA1_Update(context, (uint8_t *)"\0", 1);
     }
-    SHA1_Update(context, finalcount, 8);  /* Should cause a SHA1_Transform() */
-    for (i = 0; i < SHA1_DIGEST_SIZE; i++) {
+    DM_SHA1_Update(context, finalcount, 8);  /* Should cause a DM_SHA1_Transform() */
+    for (i = 0; i < DM_SHA1_DIGEST_SIZE; i++) {
         digest[i] = (uint8_t)
          ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255);
     }
