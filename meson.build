@@ -1,23 +1,26 @@
 project('ffi-experiments', 'c', 'cpp',
     license: 'ISC',
-    meson_version: '>=0.45.0',
+    meson_version: '>=0.49.0',
     default_options: ['c_std=c99', 'cpp_std=c++14', 'buildtype=release', 'b_ndebug=if-release']
 )
 
-cc = meson.get_compiler('c')
-cxx = meson.get_compiler('cpp')
-cflags = ['-Wunreachable-code', '-Wfloat-equal', '-Wredundant-decls', '-Winit-self', '-Wpedantic']
-if host_machine.system() == 'windows'
-    add_project_arguments('-DCURL_STATICLIB', language: ['cpp'])
-else
-    add_project_arguments(cflags, language: ['c', 'cpp'])
-endif
+deps = []
+inc_dirs = []
 
 static_deps = get_option('static_deps')
 libcurl_path = get_option('libcurl_path')
 
-deps = []
-inc_dirs = []
+cc = meson.get_compiler('c')
+cxx = meson.get_compiler('cpp')
+
+if host_machine.system() == 'windows' or static_deps == 'true'
+    add_project_arguments('-DCURL_STATICLIB', language: ['cpp'])
+endif
+
+if cc.get_argument_syntax() == 'gcc'
+    cflags = ['-Wunreachable-code', '-Wfloat-equal', '-Wredundant-decls', '-Winit-self', '-Wpedantic']
+    add_project_arguments(cc.get_supported_arguments(cflags), language: ['c', 'cpp'])
+endif
 
 if host_machine.system() == 'windows' and libcurl_path != ''
     deps += cxx.find_library('libcurl', dirs: join_paths(libcurl_path, 'lib'))
