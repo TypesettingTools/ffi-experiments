@@ -25,10 +25,10 @@ while [[ "$#" -ge 2 ]]; do
 		cat "$moonInput" | perl -pe "s/___INCLUDE___/`cat "$headerOutput"`/" > "$moonOutput"
 		# clean up preprocessed header
 		# compile the moonscript file.
-		moonc -o "$luaOutput" "$moonOutput" 2>/dev/null
+		moonc -o "$luaOutput" "$moonOutput"
 		rm "$headerOutput" "$moonOutput"
 	else
-		moonc -o "$luaOutput" "$moonInput" 2>/dev/null
+		moonc -o "$luaOutput" "$moonInput"
 	fi
 
 	shift 2
