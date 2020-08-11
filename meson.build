@@ -48,17 +48,3 @@ subdir('bad-mutex')
 subdir('precise-timer')
 subdir('download-manager')
 subdir('requireffi')
-
-if host_machine.system() != 'windows'
-    # meson is garbage and run_target appears to be the only way to
-    # actually add a new compilation target to ninja.
-    run_target('lua',
-        command: find_program('true'),
-        depends: [
-            bad_mutex_lua,
-            download_manager_lua,
-            precise_timer_lua,
-            requireffi_lua
-        ]
-    )
-endif

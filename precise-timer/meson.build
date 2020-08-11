@@ -13,6 +13,7 @@ if host_machine.system() != 'windows'
     precise_timer_lua = custom_target('PreciseTimerLua',
         output: ['PreciseTimer.lua'],
         input: [precise_timer_moon],
-        command: [lua_builder, '@INPUT@', '@OUTPUT@']
+        command: [lua_builder, '@INPUT@', '@OUTPUT@'],
+        build_by_default: true
     )
 endif

@@ -15,6 +15,7 @@ if host_machine.system() != 'windows'
     download_manager_lua = custom_target('DownloadManagerLua',
         output: ['DownloadManager.lua'],
         input: [download_manager_moon],
-        command: [lua_builder, '@INPUT@', '@OUTPUT@']
+        command: [lua_builder, '@INPUT@', '@OUTPUT@'],
+        build_by_default: true
     )
 endif
