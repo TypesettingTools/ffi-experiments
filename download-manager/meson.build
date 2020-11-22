@@ -9,7 +9,7 @@ download_manager_moon = files(
     'DownloadManager.moon'
 )
 
-download_manager = shared_library('DownloadManager', download_manager_src, dependencies: deps, include_directories: inc_dirs)
+download_manager = shared_library('DownloadManager', download_manager_src, dependencies: deps)
 
 if host_machine.system() != 'windows'
     download_manager_lua = custom_target('DownloadManagerLua',

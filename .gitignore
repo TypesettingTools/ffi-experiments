@@ -20,3 +20,6 @@ build*
 *.opensdf
 *.vcxproj.filters
 *.vcxproj.user
+
+# Meson
+subprojects/curl
