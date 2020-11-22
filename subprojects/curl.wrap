@@ -1,0 +1,4 @@
+[wrap-git]
+directory = curl
+url = https://github.com/curl/curl.git
+revision = curl-7_73_0
