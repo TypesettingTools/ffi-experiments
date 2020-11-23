@@ -56,23 +56,16 @@ if host_machine.system() == 'linux'
     deps += dependency('threads')
 endif
 
-lua_builder = find_program('BuildLua.sh')
+lua_builder = find_program('build_lua.py')
+moonc = find_program('moonc', required: false)
+lua_builder_command = [lua_builder, '@INPUT@', '@OUTPUT@']
+if moonc.found()
+    lua_builder_command += ['--moonc', moonc]
+else
+    warning('moonc not found, building only the native components')
+endif
 
 subdir('bad-mutex')
 subdir('precise-timer')
 subdir('download-manager')
 subdir('requireffi')
-
-if host_machine.system() != 'windows'
-    # meson is garbage and run_target appears to be the only way to
-    # actually add a new compilation target to ninja.
-    run_target('lua',
-        command: find_program('true'),
-        depends: [
-            bad_mutex_lua,
-            download_manager_lua,
-            precise_timer_lua,
-            requireffi_lua
-        ]
-    )
-endif

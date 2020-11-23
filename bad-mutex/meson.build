@@ -9,10 +9,9 @@ bad_mutex_moon = files(
 
 bad_mutex = shared_library('BadMutex', bad_mutex_src)
 
-if host_machine.system() != 'windows'
-    bad_mutex_lua = custom_target('BadMutexLua',
-        output: ['BadMutex.lua'],
-        input: [bad_mutex_moon],
-        command: [lua_builder, '@INPUT@', '@OUTPUT@']
-    )
-endif
+bad_mutex_lua = custom_target('BadMutexLua',
+    output: ['BadMutex.lua'],
+    input: [bad_mutex_moon],
+    command: lua_builder_command,
+    build_by_default: moonc.found()
+)
