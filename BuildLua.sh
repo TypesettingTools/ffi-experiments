@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ -z $2 ]; then
 	echo "Usage: $0 input_file output_file [input2 output2 ...]"
