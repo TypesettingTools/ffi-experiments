@@ -64,7 +64,7 @@ $(DownloadManager): LDFLAGS += -pthread
 endif
 $(DownloadManager): $(DM_OBJECTS)
 	@printf "\e[1;32m LINK\e[m $@\n"
-	@$(CXX) $(LDFLAGS) -o $@ $^
+	@$(CXX) $(LDFLAGS) -o $@ $^ -lcurl
 
 $(PreciseTimer): $(PT_OBJECTS)
 	@printf "\e[1;32m LINK\e[m $@\n"
